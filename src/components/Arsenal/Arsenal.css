@@ -1,0 +1,657 @@
+.arsenal-workbench-minimal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: 
+        linear-gradient(180deg, rgba(3, 10, 7, 0.4) 0%, rgba(3, 10, 7, 0.8) 100%),
+        url('/background/background_launchscreen.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.arsenal-workbench-minimal::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background-image:
+        linear-gradient(rgba(0, 255, 163, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 163, 0.05) 1px, transparent 1px);
+    background-size: 8rem 8rem;
+    transform: rotate(-15deg);
+    top: -50%;
+    left: -50%;
+    opacity: 0.1;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* HUD System Data Sync */
+.hud-corner {
+    position: fixed;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.top-left {
+    top: 0;
+    left: 0;
+    border-top: 1px solid rgba(0, 255, 163, 0.2);
+    border-left: 1px solid rgba(0, 255, 163, 0.2);
+    margin: 2rem;
+}
+
+.top-right {
+    top: 0;
+    right: 0;
+    text-align: right;
+    border-top: 1px solid rgba(0, 255, 163, 0.2);
+    border-right: 1px solid rgba(0, 255, 163, 0.2);
+    margin: 2rem;
+}
+
+.bottom-left {
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px solid rgba(0, 255, 163, 0.2);
+    border-left: 1px solid rgba(0, 255, 163, 0.2);
+    margin: 2rem;
+}
+
+.bottom-right {
+    bottom: 0;
+    right: 0;
+    text-align: right;
+    border-bottom: 1px solid rgba(0, 255, 163, 0.2);
+    border-right: 1px solid rgba(0, 255, 163, 0.2);
+    margin: 2rem;
+}
+
+.connection-node {
+    position: absolute;
+    width: 0.6rem;
+    height: 0.6rem;
+    background: var(--accent-primary);
+    box-shadow: 0 0 1rem var(--accent-primary);
+}
+
+.top-left .connection-node {
+    top: -0.3rem;
+    left: -0.3rem;
+}
+
+.top-right .connection-node {
+    top: -0.3rem;
+    right: -0.3rem;
+}
+
+.bottom-left .connection-node {
+    bottom: -0.3rem;
+    left: -0.3rem;
+}
+
+.bottom-right .connection-node {
+    bottom: -0.3rem;
+    right: -0.3rem;
+}
+
+.hud-data {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--accent-primary);
+    letter-spacing: 2px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    animation: hudFlicker 5s infinite;
+}
+
+@keyframes hudFlicker {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    92% {
+        opacity: 0.6;
+    }
+
+    93% {
+        opacity: 0.3;
+    }
+
+    94% {
+        opacity: 0.8;
+    }
+
+    95% {
+        opacity: 0.2;
+    }
+
+    96% {
+        opacity: 0.6;
+    }
+}
+
+/* Minimal Back Trigger Sync */
+.minimal-back-trigger {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.2s ease;
+    outline: none;
+}
+
+.minimal-back-trigger img {
+    width: 140px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    transition: all 0.2s ease;
+}
+
+.minimal-back-trigger:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+}
+
+.minimal-back-trigger:hover img {
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8));
+}
+
+.minimal-back-trigger:active {
+    transform: translateY(2px);
+    filter: brightness(0.9);
+}
+
+/* Arsenal Navigation */
+.arsenal-nav-minimal {
+    display: flex;
+    gap: 4rem;
+    margin-top: 6rem;
+    padding: 0 6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 10;
+    justify-content: center;
+}
+
+.a-nav-btn {
+    background: transparent;
+    border: none;
+    padding: 1rem 0;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.btn-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-indicator {
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    transform: translateX(-50%);
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.a-nav-btn:hover .btn-label {
+    color: #fff;
+}
+
+.a-nav-btn.active .btn-label {
+    color: var(--accent-primary);
+    letter-spacing: 6px;
+}
+
+.a-nav-btn.active .btn-indicator {
+    width: 100%;
+    box-shadow: 0 0 15px var(--accent-primary);
+}
+
+/* Arsenal Main Layout */
+.arsenal-main-minimal {
+    display: flex;
+    flex: 1;
+    gap: 3rem;
+    padding: 3rem 6rem 6rem 6rem;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.item-matrix-minimal {
+    flex: 0 0 32rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    overflow-y: auto;
+    padding-right: 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.item-matrix-minimal::-webkit-scrollbar {
+    display: none;
+}
+
+/* Tactical Node Refinement */
+.matrix-node {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.node-internal-grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(0, 255, 163, 0.05) 1px, transparent 1px);
+    background-size: 0.8rem 0.8rem;
+    opacity: 0.2;
+    top: 0;
+    left: 0;
+}
+
+.node-id {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.5rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    z-index: 5;
+}
+
+.node-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 5;
+}
+
+.equipped-tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.4rem;
+    color: var(--accent-primary);
+    letter-spacing: 1px;
+    font-weight: 900;
+    z-index: 5;
+    opacity: 0.8;
+}
+
+.node-hover-bar {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0.2rem;
+    height: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-50%);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.matrix-node.active {
+    background: rgba(0, 255, 163, 0.05);
+    border-color: var(--accent-primary);
+}
+
+.matrix-node.active .node-id,
+.matrix-node.active .node-name {
+    color: var(--accent-primary);
+}
+
+.matrix-node.active .node-hover-bar {
+    height: 100%;
+    background: var(--accent-primary);
+    box-shadow: 0 0 15px var(--accent-primary);
+}
+
+.matrix-node.locked {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Blueprint Manifest */
+.item-details-minimal {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 4rem;
+    position: relative;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.item-details-minimal::-webkit-scrollbar {
+    display: none;
+}
+
+.reader-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 255, 163, 0.02) 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    opacity: 0.2;
+}
+
+.blueprint-minimal {
+    max-width: 800px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.blueprint-header-minimal {
+    margin-bottom: 4rem;
+}
+
+.b-title-focus {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 40px rgba(0, 255, 163, 0.2);
+}
+
+.b-tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--accent-primary);
+    letter-spacing: 3px;
+    opacity: 0.6;
+}
+
+.header-separator {
+    width: 6rem;
+    height: 0.2rem;
+    background: var(--accent-primary);
+    margin-top: 1.5rem;
+    opacity: 0.3;
+}
+
+.blueprint-content-minimal {
+    display: flex;
+    gap: 5rem;
+    flex: 1;
+    align-items: flex-start;
+}
+
+.blueprint-left-side {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 25rem;
+}
+
+.blueprint-info-minimal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.info-grid-decor {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 4rem;
+    height: 4rem;
+    border-top: 0.1rem solid rgba(0, 255, 163, 0.2);
+    border-left: 0.1rem solid rgba(0, 255, 163, 0.2);
+}
+
+.b-stats-matrix {
+    display: flex;
+    gap: 4rem;
+}
+
+.stat-unit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.s-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+}
+
+.s-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+}
+
+.b-desc-minimal {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+}
+
+.blueprint-actions-minimal {
+    margin-top: 0.1rem;
+}
+
+/* Action Triggers */
+.action-trigger-minimal {
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    padding: 1rem 3rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.trigger-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--accent-primary);
+    letter-spacing: 3px;
+    position: relative;
+    z-index: 5;
+}
+
+.trigger-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: var(--accent-primary);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.action-trigger-minimal:hover:not(:disabled) .trigger-text {
+    color: #000;
+}
+
+.action-trigger-minimal:hover:not(:disabled) .trigger-fill {
+    width: 100%;
+}
+
+.action-trigger-minimal:disabled {
+    border-color: rgba(255, 255, 255, 0.1);
+    cursor: not-allowed;
+}
+
+.action-trigger-minimal:disabled .trigger-text {
+    color: rgba(255, 255, 255, 0.1);
+}
+
+.blueprint-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.1);
+    letter-spacing: 1rem;
+    text-align: center;
+}
+
+.weapon-display-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 5;
+}
+
+.weapon-display-img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 163, 0.4));
+    animation: weaponDisplayPulse 3s infinite ease-in-out;
+}
+
+@keyframes weaponDisplayPulse {
+    0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 255, 163, 0.4)) drop-shadow(0 10px 15px rgba(0, 0, 0, 0.6)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 30px rgba(0, 255, 163, 0.8)) drop-shadow(0 15px 20px rgba(0, 0, 0, 0.8)); transform: scale(1.03); }
+}
+
+@media screen and (max-width: 1200px) {
+    .blueprint-content-minimal {
+        gap: 3rem;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .arsenal-main-minimal {
+        /* Preserved Row Layout for Landscape Immersion */
+        overflow-y: hidden;
+    }
+
+    .item-matrix-minimal {
+        flex: 0 0 40%;
+        overflow-y: auto;
+    }
+
+    .matrix-node {
+        min-width: auto;
+    }
+
+    .arsenal-nav-minimal {
+        gap: 2rem;
+        padding: 0 2rem;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .arsenal-main-minimal {
+        padding: 2rem;
+        gap: 1.5rem;
+    }
+
+    .item-matrix-minimal {
+        flex: 0 0 35%;
+        padding-right: 0.5rem;
+    }
+
+    .item-matrix-minimal::-webkit-scrollbar {
+        width: 0.2rem;
+        display: block;
+    }
+
+    .matrix-node {
+        flex: 0 0 auto;
+        padding: 0.8rem;
+    }
+
+    .item-details-minimal {
+        padding: 1.5rem;
+    }
+
+    .blueprint-content-minimal {
+        /* Maintain horizontal matrix for stats */
+        flex-direction: row;
+        gap: 2rem;
+    }
+
+    .b-stats-matrix {
+        flex-direction: column;
+        gap: 1.5rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        padding-right: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .blueprint-info-minimal {
+        flex: 1;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .arsenal-nav-minimal {
+        gap: 1.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+
+    .a-nav-btn {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        white-space: nowrap;
+    }
+
+    .b-stats-matrix {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}

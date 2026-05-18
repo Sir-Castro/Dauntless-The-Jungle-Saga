@@ -1,0 +1,112 @@
+.log-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    padding: 10rem;
+    pointer-events: none;
+}
+
+.log-container {
+    max-width: 90rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.log-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    opacity: 0.4;
+}
+
+.h-tag {
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.h-line {
+    flex: 1;
+    height: 1px;
+    background: #fff;
+}
+
+.log-body {
+    position: relative;
+    padding-left: 2rem;
+    border-left: 0.2rem solid rgba(255, 255, 255, 0.1);
+}
+
+.typing-text {
+    font-family: 'monospace';
+    font-size: 1.4rem;
+    color: #fff;
+    line-height: 1.7;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    word-break: break-word;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.typing-cursor {
+    display: inline-block;
+    color: #fff;
+    font-weight: 900;
+    animation: blink 0.8s infinite;
+    margin-left: 0.5rem;
+    font-size: 1.4rem;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .log-transition-overlay {
+        padding: 4rem;
+    }
+
+    .typing-text {
+        font-size: 1.1rem;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .log-transition-overlay {
+        padding: 2rem;
+    }
+
+    .typing-text {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .log-header {
+        gap: 1rem;
+    }
+
+    .h-tag {
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+}
+
+/* App.css will handle the background transition of .bg-layer.main-menu */

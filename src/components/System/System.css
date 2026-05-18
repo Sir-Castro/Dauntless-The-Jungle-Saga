@@ -1,0 +1,294 @@
+.core-diagnostics {
+    display: flex;
+    gap: 3rem;
+    height: 100%;
+}
+
+.diag-vitals {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.vitals-grid {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+    justify-content: space-around;
+}
+
+.gauge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.gauge-ring {
+    width: 8rem;
+    height: 8rem;
+    position: relative;
+}
+
+.gauge-ring svg {
+    transform: rotate(-90deg);
+}
+
+.g-bg {
+    fill: none;
+    stroke: #222;
+    stroke-width: 8;
+}
+
+.g-fill {
+    fill: none;
+    stroke: var(--accent-primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s;
+}
+
+.g-val {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    font-weight: 900;
+}
+
+.g-label {
+    font-size: 0.5rem;
+    color: var(--text-muted);
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.vitals-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+.diag-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.diag-bar span {
+    font-size: 0.5rem;
+    font-weight: 900;
+    color: var(--accent-secondary);
+}
+
+.bar-track {
+    height: 0.2rem;
+    background: #222;
+    width: 100%;
+}
+
+.bar-fill {
+    height: 100%;
+    background: var(--accent-secondary);
+    box-shadow: 0 0 10px var(--accent-secondary);
+}
+
+/* Architecture Visual */
+.system-map {
+    flex: 1.5;
+    background: #0d0b0a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.architecture-grid {
+    width: 30rem;
+    height: 30rem;
+    position: relative;
+}
+
+.core-node {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8rem;
+    height: 8rem;
+    background: var(--bg-surface);
+    border: 0.2rem solid var(--accent-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 900;
+    z-index: 10;
+}
+
+.node-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--accent-primary);
+    animation: corePulse 2s infinite;
+}
+
+@keyframes corePulse {
+    from {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    to {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.sub-node {
+    position: absolute;
+    width: 4rem;
+    height: 4rem;
+    border: 0.1rem solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.45rem;
+    font-weight: 900;
+    color: var(--text-muted);
+}
+
+.p1 {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.p2 {
+    bottom: 0;
+    left: 20%;
+}
+
+.p3 {
+    bottom: 0;
+    right: 20%;
+}
+
+.node-link {
+    position: absolute;
+    background: #222;
+    z-index: 1;
+}
+
+.n1 {
+    width: 0.2rem;
+    height: 11rem;
+    top: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.n2 {
+    width: 10rem;
+    height: 0.2rem;
+    bottom: 4rem;
+    left: 20%;
+    transform: rotate(45deg);
+    transform-origin: left;
+}
+
+.n3 {
+    width: 10rem;
+    height: 0.2rem;
+    bottom: 4rem;
+    right: 20%;
+    transform: rotate(-45deg);
+    transform-origin: right;
+}
+
+/* Controls */
+.system-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.control-list {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.control-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.control-item span {
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.toggle-switch {
+    width: 4rem;
+    height: 1rem;
+    background: #222;
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: -0.5rem;
+    left: 0;
+    width: 1.5rem;
+    height: 2rem;
+    background: #444;
+    transition: all 0.2s;
+}
+
+.toggle-switch.active::after {
+    left: 2.5rem;
+    background: var(--accent-primary);
+    box-shadow: 0 0 1rem var(--accent-primary);
+}
+
+.system-footer-btns {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 1rem;
+}
+
+.hush-btn {
+    background: #1a1614;
+    border: 1px solid #333;
+    color: var(--text-muted);
+    padding: 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+
+.hush-btn.danger {
+    color: #f33;
+    border-color: #522;
+}
+
+.hush-btn:hover {
+    background: #222;
+    color: #fff;
+}

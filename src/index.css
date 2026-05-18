@@ -1,0 +1,66 @@
+:root {
+  font-family: 'Outfit', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Responsive Scaling Manifest */
+  font-size: clamp(8px, 1.1vw, 20px);
+
+  /* Lush Green Forest Combat Palette */
+  --bg-dark: #0a0e0c;
+  /* Deep Jungle Shadows */
+  --bg-surface: #0f1a14;
+  /* Emerald Moss */
+  --accent-primary: #00ffa3;
+  /* Neon Emerald / Combat Pulse */
+  --accent-secondary: #2ecc71;
+  /* Forest Green / Tactical Growth */
+  --accent-tertiary: #1b4d3e;
+  /* Deep Jungle / Camouflage */
+  --text-primary: #e0f2e9;
+  /* Mint-Tinted Parchment */
+  --text-muted: #4a6659;
+  /* Moss Gray */
+  --ui-border: rgba(0, 255, 163, 0.2);
+  --industrial-gray: #1a241f;
+  --neon-glow: 0 0 10px rgba(0, 255, 163, 0.3), 0 0 20px rgba(0, 255, 163, 0.1);
+  --glass-bg: rgba(26, 22, 20, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(12px);
+  --distress-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+
+  color-scheme: dark;
+  color: var(--text-primary);
+  background-color: var(--bg-dark);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  outline: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}

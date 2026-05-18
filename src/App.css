@@ -1,0 +1,83 @@
+
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: #0d0b0a;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-background-manager {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.bg-layer.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.bg-layer.launch {
+    /* Use app theme background color/gradient instead of launch screen image */
+    background:
+        linear-gradient(rgba(10, 26, 15, 0.5), rgba(10, 26, 15, 0.6));
+}
+
+.bg-layer.main-menu {
+    background-image:
+        linear-gradient(rgba(10, 26, 15, 0.6), rgba(10, 26, 15, 0.7)),
+        url('/background/background_launchscreen.png');
+}
+
+.bg-layer.game {
+    /* Background managed internally by GameScreen/LevelWorld to ensure asset-first loading */
+    background: #0a0908;
+}
+
+
+/* Ensure screens are positioned on top and fade in smoothly */
+.launch-container,
+.main-menu-modern-overlay,
+.wasteland-terminal-overlay,
+.level-select-overlay,
+.game-screen-container,
+.log-transition-overlay,
+.arsenal-workbench-minimal,
+.database-visualizer.minimal {
+    z-index: 10;
+}
+
+/* Global Screen Transition Architecture */
+.screen-transition-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 10;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.screen-transition-container.is-transitioning {
+    opacity: 0;
+}
+
+/* Navigation Transition Feedback */
+.app-container.is-navigating {
+    pointer-events: none;
+}

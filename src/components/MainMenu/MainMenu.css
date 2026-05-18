@@ -1,0 +1,234 @@
+.main-menu-modern-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.menu-content-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4vh;
+    z-index: 10;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.main-logo-container {
+    position: relative;
+    width: 90vw;
+    height: 45vh;
+    max-width: 1000px;
+    max-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-menu-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 50px rgba(0, 255, 163, 0.4));
+    z-index: 5;
+}
+
+
+.logo-ring {
+    position: absolute;
+    width: 70vmin;
+    height: 70vmin;
+    max-width: 600px;
+    max-height: 600px;
+    border: 1px dashed rgba(0, 255, 163, 0.15);
+    border-radius: 50%;
+    animation: rotateRingModern 30s linear infinite;
+}
+
+@keyframes rotateRingModern {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.logo-pulse {
+    position: absolute;
+    width: 50vmin;
+    height: 50vmin;
+    max-width: 450px;
+    max-height: 450px;
+    border: 2px solid rgba(0, 255, 163, 0.1);
+    border-radius: 50%;
+    animation: pulseModern 4s infinite ease-out;
+}
+
+@keyframes pulseModern {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { opacity: 0.4; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+
+.forest-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 900;
+    color: #e0f2e9;
+    letter-spacing: 0.5rem;
+    text-transform: uppercase;
+    text-shadow: 3px 3px 0 #1c2621, -3px -3px 0 #1c2621, 3px -3px 0 #1c2621, -3px 3px 0 #1c2621, 0 8px 15px rgba(0,0,0,0.8);
+    margin: 0;
+    margin-bottom: -4vh;
+    z-index: 20;
+    text-align: center;
+}
+
+.image-action-suite {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    z-index: 20;
+    flex-wrap: nowrap;
+    margin-top: 2rem;
+}
+
+.suite-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.side-column {
+    /* Drops the side buttons slightly below the center button to create an arc effect */
+    margin-top: 4rem; 
+}
+
+/* Image Buttons styling */
+.image-action-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.image-action-btn img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    width: 220px; 
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.6));
+    transition: all 0.2s ease;
+}
+
+.image-action-btn.primary img {
+    width: 260px;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 163, 0.4)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+    animation: primaryImagePulse 2.5s infinite ease-in-out;
+}
+
+.image-action-btn:hover {
+    transform: translateY(-4px);
+    filter: brightness(1.2);
+}
+
+.image-action-btn:active {
+    transform: translateY(4px);
+    filter: brightness(0.9);
+}
+
+.image-action-btn:active img {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+.image-action-btn.primary:active img {
+    filter: drop-shadow(0 0 10px rgba(0, 255, 163, 0.4)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
+}
+
+@keyframes primaryImagePulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px rgba(0, 255, 163, 0.4)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+    }
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 25px rgba(0, 255, 163, 0.7)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+    }
+}
+
+/* Settings Trigger */
+.settings-btn-main {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 50;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.2s ease;
+    outline: none;
+}
+
+.settings-btn-main img {
+    width: 60px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    transition: all 0.2s ease;
+}
+
+.settings-btn-main:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+}
+
+.settings-btn-main:hover img {
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8));
+}
+
+.settings-btn-main:active {
+    transform: translateY(2px);
+    filter: brightness(0.9);
+}
+
+@media screen and (max-width: 768px) {
+    .menu-content-center {
+        gap: 2vh;
+    }
+
+    .main-logo-container {
+        width: 100vw;
+        height: 35vh;
+    }
+
+    .image-action-suite {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .side-column {
+        margin-top: 0;
+    }
+
+    .image-action-btn img {
+        width: 100px; 
+    }
+
+    .image-action-btn.primary img {
+        width: 120px;
+    }
+}

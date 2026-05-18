@@ -1,0 +1,1375 @@
+import { useEffect, useRef } from 'react';
+import { PROJECTILE_STATS, PLAYER_STATS, HAZARD_STATS, TURRET_STATS, ENEMY_STATS, GLOBAL_STATS } from '../../constants.js';
+
+const useGameLoop = (params) => {
+    const {
+        isGameOver,
+        isLevelComplete,
+        respawnTimer,
+        keysRef,
+        isGroundedRef,
+        posRef,
+        velRef,
+        playerStateRef,
+        playerFacingRef,
+        isShieldActiveRef,
+        setIsGrounded,
+        setPlayerFacing,
+        fireRateModRef,
+        magRef,
+        ammoRef,
+        lastFireTimeRef,
+        setCurrentMag,
+        setPlayerFrame,
+        setPlayerState,
+        levelDataRef,
+        enemiesRef,
+        hpRef,
+        setHp,
+        setCameraX,
+        setPlayerPos,
+        projectilesRef,
+        cameraX,
+        cameraXRef,
+        setProjectiles,
+        setEnemies,
+        objectivesRef,
+        setObjectives,
+        setIsLevelComplete,
+        setIsShieldActive,
+        collectedKeysRef,
+        setCollectedKeys,
+        collectedCoinsRef,
+        setCollectedCoins,
+        collectedKitsRef,
+        setCollectedKits,
+        collectedAmmoRef,
+        setAmmo,
+        activeCheckpointId,
+        setActiveCheckpointId,
+        setCheckpointPos,
+        setLivesAtCheckpoint,
+        checkpointRegistry,
+        magSize,
+        difficulty,
+        livesAtCheckpoint,
+        setIsGameOver,
+        setRespawnTimer,
+        setKeyFrame,
+        setCoinFrame,
+        isDebriefOpen,
+        updateEnemyForTick,
+        hurtTimerRef,
+        setIsHurtFlash,
+        isPauseOpen,
+        cameraAnchorRef,
+        grenades,
+        setGrenades,
+        grenadesRef,
+        shields,
+        setShields,
+        shieldsRef,
+        isShieldOnCooldown,
+        setIsShieldOnCooldown,
+        isShieldOnCooldownRef,
+        shieldTimeRef,
+        setIsZombieNearby,
+        setIsEnemyInSight,
+        medkits,
+        setMedkits,
+        medkitsRef,
+        score,
+        setScore,
+        scoreRef,
+        levelId,
+        levelTime,
+        setLevelTime,
+        levelTimeRef,
+        setIsTimerActive,
+        isTimerActive
+    } = params;
+    const timerAccumulatorRef = useRef(0);
+    const shieldedZombiesRef = useRef(new Set());
+
+    useEffect(() => {
+        shieldedZombiesRef.current.clear();
+    }, [levelId]);
+
+    useEffect(() => {
+        let frameCount = 0;
+        let animationFrameId;
+        let lastTime = performance.now();
+        const frameInterval = 1000 / GLOBAL_STATS.TARGET_FPS; // Target logic rate
+
+        const loop = (timestamp) => {
+            const currentTime = timestamp || performance.now();
+            const elapsed = currentTime - lastTime;
+
+            if (elapsed < frameInterval) {
+                animationFrameId = requestAnimationFrame(loop);
+                return;
+            }
+
+            lastTime = currentTime - (elapsed % frameInterval);
+
+            const needsTimer = levelId === 2 ||
+                (levelId === 4 && objectivesRef.current?.find(o => o.id === 1)?.status !== 'complete') ||
+                (levelId === 7 && objectivesRef.current?.find(o => o.id === 2)?.status !== 'complete') ||
+                (levelId === 9 && objectivesRef.current?.find(o => o.id === 2)?.status !== 'complete');
+
+            if (needsTimer && !isGameOver && !isLevelComplete && !isPauseOpen && respawnTimer === 0) {
+                timerAccumulatorRef.current += elapsed;
+                if (timerAccumulatorRef.current >= 1000) {
+                    const secondsToDeduct = Math.floor(timerAccumulatorRef.current / 1000);
+                    levelTimeRef.current = Math.max(0, levelTimeRef.current - secondsToDeduct);
+                    setLevelTime(levelTimeRef.current);
+                    timerAccumulatorRef.current %= 1000;
+                    if (levelTimeRef.current === 0 && !isGameOver) {
+                        setIsGameOver(true);
+                    }
+                }
+            }
+
+            if (isGameOver || isLevelComplete || respawnTimer > 0 || isDebriefOpen || isPauseOpen) {
+                animationFrameId = requestAnimationFrame(loop);
+                return;
+            }
+
+            if (hurtTimerRef.current > 0) {
+                hurtTimerRef.current--;
+                if (hurtTimerRef.current <= 0) {
+                    setIsHurtFlash(false);
+                }
+            }
+
+            const levelData = levelDataRef.current;
+            const enemies = enemiesRef.current || [];
+            const objectives = objectivesRef.current || [];
+            if (!levelData || !levelData.platforms) {
+                animationFrameId = requestAnimationFrame(loop);
+                return;
+            }
+
+            // --- Dynamic Synchronization Engine ---
+            frameCount++;
+            // Range: -5 to 20 (Midpoint: 7.5, Amp: 12.5)
+            const platformOffset = Math.sin(frameCount / 22.5) * 12.5;
+            // Range: 13 to 35 (Midpoint: 24, Amp: 11)
+            const platformOffsetG10 = Math.sin(frameCount / 30) * 11;
+
+            // Apply Kinetic Displacement to g9 Platform (Oscillation)
+            levelData.platforms.forEach(p => {
+                if (p.id === 'g9') p.y = 7.5 + platformOffset;
+                if (p.id === 'g10') p.y = 24 + platformOffsetG10;
+            });
+
+            // Synchronize Objective key1 with Parent Platform
+            levelData.interactables.forEach(i => {
+                if (i.id === 'key1') i.y = 27.5 + platformOffset;
+                if (i.id === 'c27') i.y = 38 + platformOffsetG10;
+            });
+            // ----------------------------------------
+
+            const keys = keysRef.current;
+            const isSprinting = playerStateRef.current === 'run';
+            const maxSpeed = isSprinting ? PLAYER_STATS.RUN_SPEED : PLAYER_STATS.MAX_SPEED;
+            const groundAccel = 1.0;
+            const airAccel = 0.5;
+            const groundFriction = 0.6;
+            const airFriction = 0.98;
+
+            let nextX = posRef.current.x;
+            let nextY = posRef.current.y;
+            let nextVelY = velRef.current.y;
+            let nextVelX = velRef.current.x || 0;
+
+            // Rapid Input Polling: Determine intended tactical state suggestions
+            let intendedState = playerStateRef.current;
+
+            if (keys['KeyR'] && !['recharge', 'dead'].includes(intendedState)) {
+                if (magRef.current < magSize && ammoRef.current > 0) {
+                    intendedState = 'recharge';
+                }
+            }
+            if (keys['KeyF'] && intendedState !== 'attack' && intendedState !== 'dead') {
+                intendedState = 'attack';
+            }
+
+            const isZombieNearby = enemies.some(e =>
+                e.type.startsWith('z') && e.hp > 0 && Math.abs(e.x - nextX) < (e.detectRange || 180)
+            );
+            setIsZombieNearby(isZombieNearby);
+
+            const isEnemyInSight = enemies.some(e => {
+                if (e.hp <= 0) return false;
+                const relX = e.x - (cameraXRef.current || 0);
+                return relX > -10 && relX < 110;
+            });
+            setIsEnemyInSight(isEnemyInSight);
+            const shieldTrigger = keys['KeyH'] && shieldsRef.current > 0 && !isShieldActiveRef.current && !isShieldOnCooldownRef.current &&
+                !['dead', 'recharge'].includes(intendedState) && levelId !== 1;
+            if (shieldTrigger) {
+                isShieldActiveRef.current = true;
+                setIsShieldActive(true);
+                shieldsRef.current = Math.max(0, shieldsRef.current - 1);
+                setShields(shieldsRef.current);
+                isShieldOnCooldownRef.current = true;
+                setIsShieldOnCooldown(true);
+                shieldTimeRef.current = 60; // 1 seconds at 60fps
+                keys['KeyH'] = false; // Debounce tactial input to prevent auto-reactivation
+            }
+
+            // Manual Medical Regeneration: Restores 50% HP using tactical reserve medkits (Limit: 5)
+            if (keys['KeyV'] && medkitsRef.current > 0 && hpRef.current < 100 && ![2, 8].includes(levelId)) {
+                hpRef.current = Math.min(100, hpRef.current + 50);
+                setHp(hpRef.current);
+                medkitsRef.current--;
+                setMedkits(medkitsRef.current);
+                keys['KeyV'] = false; // Debounce manual injection
+
+                // Mission Failure Tracker: Medkit usage restricts tactical achievements in Levels 2 & 8
+                if ([2, 8].includes(levelId)) {
+                    setObjectives(obs => obs.map(o => (o.id === 2 && o.status === 'active') ? { ...o, status: 'failed', current: 0 } : o));
+                }
+            }
+
+            if (shieldTimeRef.current > 0) {
+                shieldTimeRef.current -= 1;
+                if (shieldTimeRef.current <= 0) {
+                    isShieldActiveRef.current = false;
+                    setIsShieldActive(false);
+                    isShieldOnCooldownRef.current = false;
+                    setIsShieldOnCooldown(false);
+                }
+            }
+
+            // Apply horizontal damping (Friction)
+            nextVelX *= (isGroundedRef.current ? groundFriction : airFriction);
+
+            // Apply sliding physics for ramps
+            if (isGroundedRef.current && velRef.current.platId) {
+                if (['g2', 'g4'].includes(velRef.current.platId)) {
+                    nextVelX -= 0.12; // Slide down-left
+                } else if (['g3', 'g5'].includes(velRef.current.platId)) {
+                    nextVelX += 0.12; // Slide down-right
+                }
+            }
+
+            // Apply controlled acceleration from input
+            if (playerStateRef.current !== 'recharge') {
+                if (keys['KeyA'] || keys['ArrowLeft']) {
+                    nextVelX -= (isGroundedRef.current ? groundAccel : airAccel);
+                    if (playerFacingRef.current !== -1) {
+                        playerFacingRef.current = -1;
+                        setPlayerFacing(-1);
+                    }
+                } else if (keys['KeyD'] || keys['ArrowRight']) {
+                    nextVelX += (isGroundedRef.current ? groundAccel : airAccel);
+                    if (playerFacingRef.current !== 1) {
+                        playerFacingRef.current = 1;
+                        setPlayerFacing(1);
+                    }
+                }
+            }
+
+            // Cap the cross-sector velocity
+            if (Math.abs(nextVelX) > maxSpeed) {
+                nextVelX = Math.sign(nextVelX) * maxSpeed;
+            }
+
+            // Integrate horizontal velocity into position
+            nextX += nextVelX;
+
+            // Jump: strong initial impulse for a snappy launch
+            if (keys['Space'] && isGroundedRef.current && playerStateRef.current !== 'recharge') {
+                nextVelY = 12.0;
+                isGroundedRef.current = false;
+                setIsGrounded(false);
+            }
+
+            // Gravity Calibration
+            const gravity = nextVelY < 0 ? 2.6 : 1.8;
+            const now = performance.now();
+            const baseCooldown = PLAYER_STATS.FIRE_RATE_BASE_COOLDOWN;
+            const minCooldown = PLAYER_STATS.FIRE_RATE_MIN_COOLDOWN;
+            const currentCooldown = Math.max(minCooldown, baseCooldown / fireRateModRef.current);
+
+            // Determine Intended State
+            if (intendedState !== 'dead') {
+                if (isGroundedRef.current && !['attack', 'recharge', 'shoot', 'hurt', 'grenade'].includes(intendedState)) {
+                    if (keys['KeyA'] || keys['KeyD'] || keys['ArrowLeft'] || keys['ArrowRight']) {
+                        intendedState = 'run';
+                    } else {
+                        intendedState = 'idle';
+                    }
+                } else if (!isGroundedRef.current && !['attack', 'recharge', 'shoot', 'hurt', 'grenade'].includes(intendedState)) {
+                    intendedState = 'jump';
+                }
+            }
+
+            // Tactical Actions (Shooting/Grenades)
+            if (keys['KeyG'] && grenadesRef.current > 0 && isEnemyInSight && !['recharge', 'dead', 'hurt', 'grenade'].includes(intendedState) && levelId !== 1) {
+                if (now - lastFireTimeRef.current > currentCooldown * 2) {
+                    intendedState = 'grenade';
+                    lastFireTimeRef.current = now;
+                    if (playerStateRef.current !== 'grenade') setPlayerFrame(0);
+                }
+            } else if (keys['KeyE'] && !['recharge', 'dead', 'hurt', 'grenade'].includes(intendedState)) {
+                if (now - lastFireTimeRef.current > currentCooldown) {
+                    if (magRef.current > 0) {
+                        intendedState = 'shoot';
+                        magRef.current -= 1;
+                        setCurrentMag(magRef.current);
+                        lastFireTimeRef.current = now;
+                        if (playerStateRef.current !== 'shoot') setPlayerFrame(0);
+                        fireRateModRef.current = Math.min(2.5, fireRateModRef.current + 0.2);
+
+                        const shotFacing = playerFacingRef.current;
+                        projectilesRef.current.push({
+                            id: now + Math.random(),
+                            x: nextX + (shotFacing * 2),
+                            y: nextY + 18.0,
+                            vx: shotFacing * PROJECTILE_STATS.PLAYER_BULLET_SPEED,
+                            facing: shotFacing,
+                            owner: 'player',
+                            bounces: 0,
+                            life: Math.floor(PROJECTILE_STATS.BULLET_TRAVEL_DISTANCE / PROJECTILE_STATS.PLAYER_BULLET_SPEED)
+                        });
+                    } else if (ammoRef.current > 0) {
+                        intendedState = 'recharge';
+                        if (playerStateRef.current !== 'recharge') setPlayerFrame(0);
+                    }
+                }
+            } else if (!keys['KeyE'] && !keys['KeyG']) {
+                fireRateModRef.current = Math.max(1, fireRateModRef.current - 0.08);
+            }
+
+            // Automatic Tactical Reload: Initiates recharge when magazine is depleted
+            if (magRef.current === 0 && ammoRef.current > 0 && !['recharge', 'dead', 'hurt'].includes(intendedState)) {
+                intendedState = 'recharge';
+                if (playerStateRef.current !== 'recharge') setPlayerFrame(0);
+            }
+
+            if (intendedState !== playerStateRef.current) {
+                playerStateRef.current = intendedState;
+                setPlayerState(intendedState);
+                setPlayerFrame(0);
+            }
+
+            // Horizontal Wall Collision
+            let canMoveX = true;
+            const wallColliderHalfWidth = 2.2;
+            const verticalOffset = 2.5; // Configurable structural offset to prevent sinking
+
+            const getPlatWidth = (p) => {
+                if (p.w !== 400) return p.w;
+                if (['g2', 'g4', 'g3', 'g5'].includes(p.id)) return 7;
+                return 14;
+            };
+
+            const getPlatTop = (p, sx) => {
+                let baseTop = p.y + (p.h / 9.5) + verticalOffset;
+                const platW = getPlatWidth(p);
+                const clampedVal = Math.max(0, Math.min(1.0, (sx - p.x) / platW));
+                if (['g2', 'g3'].includes(p.id)) {
+                    const height = 10;
+                    if (p.id === 'g2') return baseTop - ((1.0 - clampedVal) * height);
+                    return baseTop - (clampedVal * height);
+                }
+                if (['g4', 'g5'].includes(p.id)) {
+                    const height = 8.2;
+                    if (p.id === 'g4') return baseTop - ((1.0 - clampedVal) * height);
+                    return baseTop - (clampedVal * height);
+                }
+                return baseTop; // Flat
+            };
+
+            const currentPlat = velRef.current.platId;
+            const isOnSlope = ['g2', 'g4', 'g3', 'g5'].includes(currentPlat);
+
+            levelData.platforms.forEach(p => {
+                // Ignore background supports (g15, g13) and ramps for horizontal wall checks
+                if (['g15', 'g13', 'g2', 'g4', 'g3', 'g5', 'v1', 'g1'].includes(p.id)) return;
+
+                const stepTolerance = isOnSlope ? 12.0 : 1.0;
+                const platW = getPlatWidth(p);
+                const platTop = getPlatTop(p, nextX);
+                const charHeight = 15;
+                const extraMargin = ['g8', 'g9'].includes(p.id) ? 0.8 : 0;
+                if (posRef.current.y < (platTop - stepTolerance) && (posRef.current.y + charHeight) > p.y) {
+                    if (nextX + wallColliderHalfWidth + extraMargin > p.x && nextX - wallColliderHalfWidth - extraMargin < p.x + platW) {
+                        canMoveX = false;
+                    }
+                }
+            });
+
+            // Ceiling Collision Solver (The Bonk): Prevents jumping through solid architecture
+            levelData.platforms.forEach(p => {
+                if (['g15', 'g13', 'g2', 'g4', 'g3', 'g5', 'v1'].includes(p.id)) return;
+
+                const platW = getPlatWidth(p);
+                const charHeight = 15;
+                const isHorizAligned = nextX + 1.2 > p.x && nextX - 1.2 < p.x + platW;
+
+                if (isHorizAligned) {
+                    const headY = nextY + charHeight;
+                    // Check if head hits the underside of a platform
+                    if (headY > p.y && headY < p.y + 5 && nextVelY > 0) {
+                        nextY = p.y - charHeight - 0.2;
+                        nextVelY = -0.5; // Immediate reversal on impact
+                    }
+                }
+            });
+
+            if (!canMoveX) {
+                nextX = posRef.current.x;
+                nextVelX = 0;
+            }
+
+            // --- Enhanced Soldier Kinetic Solver ---
+            // Applies consistent gravity and verifies platform support each tick.
+            nextVelY -= gravity;
+            if (nextVelY < -15.0) nextVelY = -15.0;
+
+            nextY += nextVelY;
+
+            let grounded = false;
+            let finalPlatId = null;
+            const groundColliderHalfWidth = 1.8; // Edge overlap allowance for natural standing
+
+            let bestY = -Infinity;
+            let foundGround = false;
+            let bestId = null;
+
+            levelData.platforms.forEach(p => {
+                if (['v1', 'g15', 'g13'].includes(p.id)) return;
+                const isSlope = ['g2', 'g4', 'g3', 'g5'].includes(p.id);
+                const platW = getPlatWidth(p);
+                const platTop = getPlatTop(p, nextX);
+
+                const extraMargin = ['g8', 'g9'].includes(p.id) ? 0.8 : 0;
+                const horizMatch = nextX >= p.x - groundColliderHalfWidth - 0.1 - extraMargin &&
+                    nextX <= (p.x + platW + groundColliderHalfWidth + 0.1 + extraMargin);
+
+                if (horizMatch) {
+                    const prevY = posRef.current.y;
+                    const catchRange = isSlope ? 8.0 : 2.5;
+
+                    let shouldSnap = (prevY >= platTop - catchRange && nextY <= platTop);
+
+                    if (isSlope && isGroundedRef.current && nextVelY <= 0) {
+                        if (nextY > platTop && nextY <= platTop + 6.0) {
+                            shouldSnap = true;
+                        }
+                    }
+
+                    if (shouldSnap) {
+                        if (platTop > bestY) {
+                            bestY = platTop;
+                            bestId = p.id;
+                            foundGround = true;
+                        }
+                    }
+                }
+            });
+
+            if (foundGround) {
+                nextY = bestY;
+                nextVelY = 0;
+                grounded = true;
+                finalPlatId = bestId;
+            }
+
+            // Death Plane Trigger (Fall into pits)
+            if (nextY < -15 && playerStateRef.current !== 'dead') {
+                playerStateRef.current = 'dead';
+                setPlayerState('dead');
+                setPlayerFrame(0);
+                nextVelY = -0.05;
+            }
+
+            velRef.current.y = nextVelY;
+            velRef.current.x = nextVelX;
+            if (grounded) velRef.current.platId = finalPlatId;
+            else if (nextVelY < -1.0) velRef.current.platId = null;
+
+            const groundedChanged = isGroundedRef.current !== grounded;
+            isGroundedRef.current = grounded;
+            if (groundedChanged) {
+                setIsGrounded(grounded);
+            }
+
+            const extractionPoint = levelData.interactables.find(i => i.type === 'extraction');
+            const extractionX = extractionPoint ? extractionPoint.x : 485;
+
+            if (nextX < 0) nextX = 0;
+            if (nextX > extractionX + 11) nextX = extractionX + 11;
+
+            if (hpRef.current <= 0 && playerStateRef.current !== 'dead') {
+                playerStateRef.current = 'dead';
+                setPlayerState('dead');
+                setPlayerFrame(0);
+            }
+
+            // Directional Anchor System (30/70 Smooth Transition)
+            const visibleWidth = 100 / 0.9;
+            const currentCamView = cameraXRef ? cameraXRef.current : cameraX;
+
+            // Target Anchor: 30% from left when facing Right, 70% from left when facing Left
+            const targetAnchorRatio = playerFacingRef.current === 1 ? 0.3 : 0.7;
+
+            // Smoothly shift the anchor point during direction changes (Cinematic Look-Ahead)
+            if (cameraAnchorRef.current === undefined) cameraAnchorRef.current = 0.3;
+            const anchorLerp = 0.045;
+            cameraAnchorRef.current += (targetAnchorRatio - cameraAnchorRef.current) * anchorLerp;
+
+            // Solve for the exact camera position to keep player locked at the interpolated anchor
+            const currentAnchorX = visibleWidth * cameraAnchorRef.current;
+            let nextCameraX = nextX - currentAnchorX;
+
+            // World Boundary Constraints
+            const lastFlag = levelData.checkpoints && levelData.checkpoints.length > 0
+                ? levelData.checkpoints.reduce((max, cp) => cp.x > max.x ? cp : max)
+                : null;
+            const stopReferenceX = lastFlag ? lastFlag.x : (extractionX || 485);
+            const cameraStopX = Math.max(0, stopReferenceX - (visibleWidth * 0.85));
+            nextCameraX = Math.max(0, Math.min(cameraStopX, nextCameraX));
+
+            // Synchronize State & Ref
+            if (Math.abs(nextCameraX - currentCamView) > 0.001) {
+                if (cameraXRef) cameraXRef.current = nextCameraX;
+                setCameraX(nextCameraX);
+            }
+
+            // Viewport Safety Protocol: Absolute Screen Clamping
+            const viewMarginX = 10.0; // Reinforced horizontal buffer (accounts for sprite width)
+            const minXInView = nextCameraX + viewMarginX;
+            const maxXInView = nextCameraX + visibleWidth - viewMarginX;
+
+            // Horizontal Clamping
+            if (nextX < minXInView) {
+                nextX = minXInView;
+                nextVelX = 0;
+            } else if (nextX > maxXInView && nextCameraX < cameraStopX - 0.01) {
+                nextX = maxXInView;
+                nextVelX = 0;
+            }
+
+            // Vertical Clamping (Ceiling only - Floor handled by Gravity & Platforms)
+            const visibleHeight = 100 / 0.9;
+            const viewMarginY = 8.0;
+            const maxYInView = visibleHeight - viewMarginY;
+
+            if (nextY > maxYInView) {
+                nextY = maxYInView;
+                nextVelY = 0;
+            }
+
+            posRef.current = { x: nextX, y: nextY };
+            setPlayerPos(posRef.current);
+
+            const cameraXForCulling = (cameraXRef && typeof cameraXRef.current === 'number')
+                ? cameraXRef.current
+                : cameraX;
+
+            let newSmokes = [];
+            projectilesRef.current = projectilesRef.current.map(p => {
+                let nextX = p.x + p.vx;
+                let nextY = p.y + (p.vy || 0);
+                let nextVx = p.vx;
+                let nextVy = p.vy || 0;
+                let nextFacing = p.facing;
+                let nextLife = p.life !== undefined ? p.life - 1 : undefined;
+
+                let nextBounces = p.bounces || 0;
+
+                if (p.type === 'grenade_fuse') {
+                    // Consistent Gravity
+                    nextVy -= 0.35; // Softer gravity for smoother descent
+
+                    // Stable Resting Physics: Transition to sliding state on ground contact
+                    if (nextBounces >= 2) {
+                        nextVx *= 0.92; // Ground friction/slide
+                        nextVy = 0;
+                    }
+
+                    if (nextLife <= 0) {
+                        // Animation Guard: Detonation follows throw follow-through
+                        if (playerStateRef.current === 'grenade') {
+                            nextLife = 1;
+                        } else {
+                            newSmokes.push({
+                                id: Math.random(),
+                                type: 'grenade_explosion',
+                                x: nextX,
+                                y: nextY + (PROJECTILE_STATS.GRENADE_EXPLOSION_Y_OFFSET || 0),
+                                vx: 0,
+                                vy: 0,
+                                facing: nextFacing,
+                                owner: 'player',
+                                life: 14 // 14 frames @ 1:1 playback
+                            });
+                            return null;
+                        }
+                    }
+                }
+
+                let isDestroyedByBlock = false;
+                levelData.platforms.forEach(plat => {
+                    if (['v1', 'g15', 'g13', 'g1', 'g2', 'g3', 'g4', 'g5'].includes(plat.id)) return;
+                    // Unified Geometric Surface Detection
+                    const platTop = plat.y + (plat.h / 9.5) + 1.2; // Perfectly synced with soldier ground axis
+                    const platSideMargin = 1.2;
+
+                    // 1. Horizontal Side Edge Collision (Hitting vertical walls/edges)
+                    const isBullet = p.type !== 'grenade_fuse' && p.type !== 'grenade_smoke' && p.type !== 'grenade_explosion';
+                    if (isBullet && nextY > plat.y && nextY < platTop) {
+                        if (p.x <= plat.x && nextX >= plat.x) isDestroyedByBlock = true;
+                        if (p.x >= (plat.x + plat.w) && nextX <= (plat.x + plat.w)) isDestroyedByBlock = true;
+                    }
+
+                    // 2. Vertical Top Surface Collision (Existing ground plane logic)
+                    if (nextX + platSideMargin > plat.x && nextX - platSideMargin < plat.x + plat.w) {
+                        // Advanced Proximity Detection (Crossing Surface Plane)
+                        if (p.y >= platTop - 0.5 && nextY <= platTop) {
+                            if (p.type === 'grenade_fuse') {
+                                if (nextBounces < 1 && Math.abs(nextVy) > 0.4) {
+                                    nextVy = Math.abs(nextVy) * 0.4; // Controlled bounce
+                                    nextBounces++;
+                                } else {
+                                    nextVy = 0;
+                                    nextVx *= 0.7; // Initial impact friction (allows sliding)
+                                    nextBounces = 2; // Transition to sliding/resting state
+                                }
+                                nextY = platTop;
+                            } else {
+                                isDestroyedByBlock = true;
+                            }
+                        }
+                    }
+                });
+
+                if (p.type === 'grenade_smoke') isDestroyedByBlock = false;
+
+                if (isDestroyedByBlock && p.type !== 'grenade_explosion') return null;
+                return { ...p, x: nextX, y: nextY, vx: nextVx, vy: nextVy, facing: nextFacing, life: nextLife, bounces: nextBounces };
+            }).filter(p => p !== null && (p.life === undefined || p.life > 0)).concat(newSmokes).filter(p => {
+                // Grenade Explosion Damage: Radius detection (Processed before early returns)
+                if (p.type === 'grenade_explosion' && p.life === 14) {
+                    const hitEnemyIds = [];
+                    enemies.forEach(e => {
+                        if (e.hp <= 0) return;
+
+                        // Screen Visibility Gating: Enemies are invulnerable until they enter the viewport
+                        const relX = e.x - cameraXRef.current;
+                        const isVisible = relX > -10 && relX < 110; // Margin to allow for partial entry
+                        if (!isVisible) return;
+
+                        const distX = Math.abs(p.x - e.x);
+                        const correctedY = p.y - (PROJECTILE_STATS.GRENADE_EXPLOSION_Y_OFFSET || 0);
+                        const distY = Math.abs(correctedY - (e.y + 12));
+                        if (distX < 35 && distY < 35) { // Expanded lethal radius
+                            hitEnemyIds.push(e.id);
+                        }
+                    });
+
+                    if (hitEnemyIds.length > 0) {
+                        setEnemies(prev => prev.map(item => {
+                            if (hitEnemyIds.includes(item.id) && item.hp > 0) {
+                                const newHp = Math.max(0, item.hp - PROJECTILE_STATS.GRENADE_DAMAGE_THRESHOLD);
+                                const isZombie = item.type.startsWith('z');
+                                const isRaider = item.type.startsWith('raider');
+
+                                if (newHp === 0) {
+                                    const points = isZombie
+                                        ? (ENEMY_STATS.ZOMBIE_POINTS[item.type] || 0)
+                                        : (ENEMY_STATS.RAIDER_POINTS[item.type] || 0);
+                                    scoreRef.current += points;
+                                    setScore(scoreRef.current);
+                                    if ([2, 3, 4, 5, 7, 8, 9, 10].includes(levelId)) {
+                                        setObjectives(obs => {
+                                            return obs.map(o => {
+                                                if (o.status !== 'active') return o;
+                                                let increment = false;
+
+                                                if (levelId === 2 && o.id === 1 && isZombie) increment = true;
+                                                if (levelId === 3 && o.id === 1 && isZombie) increment = true;
+                                                if (levelId === 4) {
+                                                    if (o.id === 1 && isZombie) increment = true;
+                                                    if (o.id === 2 && isRaider) increment = true;
+                                                }
+                                                if (levelId === 5 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 7 && o.id === 1) increment = true; // Grenade kills specific objective
+                                                if (levelId === 8 && o.id === 1 && isZombie) increment = true;
+                                                if (levelId === 9 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 10 && o.id === 2 && isZombie) increment = true;
+
+                                                if (increment) {
+                                                    const nextCount = (o.current || 0) + 1;
+                                                    const isDone = nextCount >= (o.target || 5);
+                                                    return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                                }
+                                                return o;
+                                            });
+                                        });
+
+                                        if (levelId === 2 && isZombie) {
+                                            ammoRef.current += PLAYER_STATS.DROPPED_MAGAZINE_AMMO;
+                                            setAmmo(ammoRef.current);
+                                        }
+                                    }
+                                }
+
+                                return {
+                                    ...item,
+                                    hp: newHp,
+                                    state: newHp === 0 ? 'dead' : item.state,
+                                    frame: newHp === 0 ? 0 : item.frame,
+                                    hasDroppedAmmo: newHp === 0 && item.type.startsWith('raider'),
+                                    hurtFlashTicks: 13
+                                };
+                            }
+                            return item;
+                        }));
+                    }
+                    return true;
+                }
+
+                if (p.type === 'grenade_explosion' || p.type === 'grenade_fuse') return true;
+
+                const relativeX = p.x - cameraXForCulling;
+                if (relativeX < -150 || relativeX > 250) return false;
+
+
+                let hitEnemyId = null;
+                enemies.forEach(e => {
+                    if (e.hp <= 0) return;
+
+                    const isZombie = e.type.startsWith('z');
+                    const isRaider = e.type.startsWith('raider');
+                    const bulletFromPlayer = p.owner === 'player';
+                    const bulletFromZombie = p.owner === 'enemy' && p.type === 'punch'; // Visual punch treated as melee
+                    const bulletFromOpposingFaction = p.owner === 'enemy' && (
+                        (p.type !== 'punch' && isZombie) || // Raider bullet hitting zombie
+                        (p.type === 'punch' && isRaider)   // For future proofing
+                    );
+
+                    const isHostile = bulletFromPlayer ||
+                        (p.type === 'punch' && isRaider) ||
+                        (p.type !== 'punch' && isZombie) ||
+                        (p.isRicochet && (isRaider || isZombie));
+
+                    if (!isHostile) return;
+
+                    // Screen Visibility Gating: Enemies only take damage when on screen
+                    const relX = e.x - cameraXRef.current;
+                    const isVisible = relX > -10 && relX < 110;
+                    if (!isVisible) return;
+
+                    const distX = Math.abs(p.x - e.x);
+                    const distY = Math.abs(p.y - (e.y + 18));
+                    if (distX < 6 && distY < 12) {
+                        hitEnemyId = e.id;
+                    }
+                });
+
+                if (hitEnemyId !== null) {
+                    setEnemies(prev => prev.map(e => {
+                        if (e.id === hitEnemyId) {
+                            if (e.hp > 0) {
+                                let damage = p.damage || PROJECTILE_STATS.PLAYER_BULLET_DAMAGE;
+                                const isZombie = e.type.startsWith('z');
+                                const isRaider = e.type.startsWith('raider');
+
+                                // Faction Damage Multipliers & Rules
+                                if (p.owner === 'enemy') {
+                                    if (p.type !== 'punch' && isZombie) {
+                                        // Raider shooting Zombie: Lethality Enabled
+                                        damage = p.damage || 10; // Raiders deal 10 dmg to zombies
+                                    } else if (p.type === 'punch' && isRaider) {
+                                        // Zombie attacking Raider: High Lethality
+                                        damage = 25;
+                                    }
+                                }
+
+                                const newHp = Math.max(0, e.hp - damage);
+
+                                if (newHp === 0) {
+                                    const points = isZombie
+                                        ? (ENEMY_STATS.ZOMBIE_POINTS[e.type] || 0)
+                                        : (ENEMY_STATS.RAIDER_POINTS[e.type] || 0);
+                                    scoreRef.current += points;
+                                    setScore(scoreRef.current);
+                                    if (levelId === 2 && isZombie) {
+                                        ammoRef.current += PLAYER_STATS.DROPPED_MAGAZINE_AMMO;
+                                        setAmmo(ammoRef.current);
+
+                                        setObjectives(obs => {
+                                            const newObs = obs.map(o => {
+                                                if (o.id === 1) {
+                                                    const nextCount = (o.current || 0) + 1;
+                                                    const isDone = nextCount >= (o.target || 20);
+                                                    return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                                }
+                                                return o;
+                                            });
+                                            const obj1 = newObs.find(o => o.id === 1);
+                                            if (obj1 && obj1.status === 'complete') {
+                                                return newObs.map(o => (o.id === 2 && o.status === 'pending') ? { ...o, status: 'active' } : o);
+                                            }
+                                            return newObs;
+                                        });
+                                    }
+
+                                    if (levelId === 4 && isZombie) {
+                                        setObjectives(obs => {
+                                            return obs.map(o => {
+                                                if (o.id === 1 && o.status === 'active') {
+                                                    const nextCount = (o.current || 0) + 1;
+                                                    const isDone = nextCount >= (o.target || 10);
+                                                    return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                                }
+                                                return o;
+                                            });
+                                        });
+                                    }
+
+                                    // Tactical Combat Objectives (Levels 5, 7, 8, 9, 10)
+                                    if ([5, 7, 8, 9, 10].includes(levelId)) {
+                                        const isRaider = e.type.startsWith('raider');
+                                        const isZomb = e.type.startsWith('z');
+                                        const fromPlayer = p.owner === 'player' && p.type !== 'punch';
+                                        const fromZombMelee = p.owner === 'enemy' && p.type === 'punch';
+                                        const fromGrenade = p.type === 'grenade_explosion';
+
+                                        setObjectives(obs => {
+                                            return obs.map(o => {
+                                                if (o.status !== 'active') return o;
+                                                let increment = false;
+
+                                                if (levelId === 5 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 7 && o.id === 1 && fromGrenade) increment = true;
+
+                                                if (levelId === 9 && o.id === 1 && isRaider) increment = true;
+
+                                                if (levelId === 10) {
+                                                    if (o.id === 1 && isRaider && fromZombMelee) increment = true;
+                                                    if (o.id === 2 && isZomb && fromGrenade) increment = true;
+                                                }
+
+                                                if (increment) {
+                                                    const nextCount = (o.current || 0) + 1;
+                                                    const isDone = nextCount >= (o.target || 5);
+                                                    return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                                }
+                                                return o;
+                                            });
+                                        });
+                                    }
+                                }
+
+                                return {
+                                    ...e,
+                                    hp: newHp,
+                                    state: newHp === 0 ? 'dead' : e.state,
+                                    frame: newHp === 0 ? 0 : e.frame,
+                                    hasDroppedAmmo: newHp === 0 && isRaider,
+                                    hurtFlashTicks: 13
+                                };
+                            }
+                        }
+                        return e;
+                    }));
+                    return false;
+                }
+
+                // Hazard Collision Solver: Detect hits on destructible hazards (t1 turrets)
+                let hitHazardId = null;
+                if (p.owner === 'player') {
+                    (levelData.hazards || []).forEach(h => {
+                        if (h.type === 'turret_top' && h.hp !== 0) {
+                            const dx = Math.abs(p.x - (h.x + (h.w || 5) / 2));
+                            const dy = Math.abs(p.y - (h.y + 10));
+                            if (dx < 12 && dy < 15) {
+                                hitHazardId = h.id;
+                            }
+                        }
+                    });
+                }
+
+                if (hitHazardId !== null) {
+                    const h = levelData.hazards.find(haz => haz.id === hitHazardId);
+                    if (h) {
+                        if (h.hp === undefined) h.hp = 10;
+                        h.hp = Math.max(0, h.hp - 1);
+                        h.hurtFlash = 10;
+                    }
+                    return false; // Bullet destroyed on impact
+                }
+
+                if (p.owner === 'enemy') {
+                    const pDist = Math.abs(p.x - posRef.current.x);
+                    const pVDist = Math.abs(p.y - (posRef.current.y + 11)); // Target chest/waist
+                    if (pDist < 3.8 && pVDist < 7.5) { // Narrowed hitbox for precision targeting
+                        if (isShieldActiveRef.current) {
+                            // Level 8: Shield Defense Objective - Unique Zombies Only
+                            if (levelId === 8 && p.type === 'punch' && p.parentId && !shieldedZombiesRef.current.has(p.parentId)) {
+                                shieldedZombiesRef.current.add(p.parentId);
+                                setObjectives(obs => obs.map(o => {
+                                    if (o.id === 1 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 5);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                }));
+                            }
+
+                            // Turret bullets are neutralized by shields regardless of angle
+                            if (p.type === 'turret_bullet') {
+                                return false; // Immediate penetration failure
+                            }
+
+                            const bulletFacing = Math.sign(p.vx);
+                            // Only ricochet if the bullet hits the front of the shield
+                            if (bulletFacing !== playerFacingRef.current) {
+                                p.vx = -p.vx * 1.5; // Reflect with increased speed
+                                p.vy = -2 + Math.random() * 4;
+                                // Shift position forward to the shield's edge for a more natural bounce
+                                p.x = posRef.current.x + (playerFacingRef.current * 7.5);
+                                p.isRicochet = true;
+                                p.life = 20;
+                                return true; // Stay alive to act as a ricochet projectile
+                            }
+                        }
+
+                        // Allow turret bullets to inflict individual damage even during hurt flash invincibility
+                        if (hurtTimerRef.current > 0 && p.type !== 'turret_bullet') return false;
+
+                        if (hpRef.current > 0) {
+                            hpRef.current = Math.max(0, hpRef.current - (p.damage || difficulty.enemyDmg));
+                            setHp(hpRef.current);
+                            hurtTimerRef.current = 24; // ~400ms flash pulse
+                            setIsHurtFlash(true);
+                        }
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+            setProjectiles(projectilesRef.current || []);
+
+
+
+            if (levelData.checkpoints && levelData.checkpoints.length > 0) {
+                const lastFlag = levelData.checkpoints.reduce((max, cp) => cp.x > max.x ? cp : max);
+                // Trigger level completion when crossing the last flag's threshold
+                if (nextX > lastFlag.x) {
+                    let allDone = true;
+                    const finalObjectives = objectivesRef.current.map(o => {
+                        if (o.status === 'failed') {
+                            allDone = false;
+                            return o;
+                        }
+                        if (o.status === 'active') {
+                            // Implicit END-OF-LEVEL success criteria
+                            // hideCounter (e.g. Timer) or target === 1 && current === 1 (e.g. No Medkits)
+                            if (o.hideCounter || (o.target === 1 && o.current === 1)) {
+                                return { ...o, status: 'complete' };
+                            } else {
+                                allDone = false;
+                                return o;
+                            }
+                        }
+                        return o; // status === 'complete'
+                    });
+
+                    if (allDone) {
+                        // Apply final objective states to ensure UI updates flawlessly
+                        setObjectives(finalObjectives);
+                        setIsLevelComplete(true);
+                    } else {
+                        // Creates an invisible kinetic barrier preventing level exit until objectives are met
+                        nextX = lastFlag.x;
+                    }
+                }
+            }
+
+            levelData.interactables.forEach(i => {
+                const dx = Math.abs(nextX - i.x);
+                const dy = nextY - i.y;
+
+                if ((i.type === 'key' || i.type === 'tracker') && !collectedKeysRef.current.includes(i.id)) {
+                    if (dx < 10 && dy >= -8 && dy < 25) {
+                        setCollectedKeys(prev => prev.includes(i.id) ? prev : [...prev, i.id]);
+                        collectedKeysRef.current.push(i.id);
+                    }
+                }
+                if (i.type === 'coin' && !collectedCoinsRef.current.includes(i.id)) {
+                    if (dx < 10 && dy >= -8 && dy < 25) {
+                        setCollectedCoins(prev => prev.includes(i.id) ? prev : [...prev, i.id]);
+                        collectedCoinsRef.current.push(i.id);
+                        scoreRef.current += 10;
+                        setScore(scoreRef.current);
+
+                        if ([1, 4, 5, 6, 9].includes(levelId)) {
+                            setObjectives(obs => {
+                                const newObs = obs.map(o => {
+                                    const isCoinObjective = (levelId === 1 && o.id === 1) ||
+                                        (levelId === 4 && o.id === 2) ||
+                                        ([5, 6, 9].includes(levelId) && o.id === 2);
+
+                                    if (isCoinObjective && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 20);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                                // Objective Chaining
+                                const obj1 = newObs.find(o => o.id === 1);
+                                if (obj1 && obj1.status === 'complete') {
+                                    return newObs.map(o => (o.id === 2 && o.status === 'pending') ? { ...o, status: 'active' } : o);
+                                }
+                                return newObs;
+                            });
+                        }
+                    }
+                }
+                if (i.type === 'kit' && !collectedKitsRef.current.includes(i.id)) {
+                    if (dx < 10 && dy >= -8 && dy < 25) {
+                        if (medkitsRef.current < (PLAYER_STATS.MAX_MEDKITS || 2)) {
+                            setCollectedKits(prev => prev.includes(i.id) ? prev : [...prev, i.id]);
+                            collectedKitsRef.current.push(i.id);
+                            medkitsRef.current++;
+                            setMedkits(medkitsRef.current);
+                        }
+                    }
+                }
+            });
+
+            // Dynamic Hazards Logic (Patrol AI and Collision Solver)
+            (levelData.hazards || []).forEach(h => {
+                if (!h) return;
+                if (h.type === 'turret_top') {
+                    if (h.hp === 0) {
+                        // Gradual transition to deactivated state
+                        const targetRotation = -90;
+                        const currentRotation = h.rotation || 0;
+                        const diff = targetRotation - currentRotation;
+                        if (Math.abs(diff) > 2) {
+                            h.rotation = currentRotation + (Math.sign(diff) * 2);
+                        } else {
+                            h.rotation = targetRotation;
+                        }
+                    } else {
+                        // Update rotation to track player
+                        const turretCenterX = h.x + ((h.w || 5) / 2);
+                        const turretCenterY = h.y + 8.0; // Calibrated pivot height for t1.png sprite scaling
+                        const targetX = nextX;
+                        const targetY = nextY + 8.5; // Improved targeting height alignment
+
+                        const dx = targetX - turretCenterX;
+                        const dy = targetY - turretCenterY;
+                        const targetDist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (targetDist < TURRET_STATS.T1_DETECT_RANGE) {
+                            h.rotation = Math.atan2(dy, dx) * (180 / Math.PI);
+
+                            // Temporal Succession: Fire 3 rounds over a 6-frame window to maintain angular consistency with the turret's tracking
+                            const fireCycle = frameCount % (h.fireRate || TURRET_STATS.T1_FIRE_RATE);
+                            if (fireCycle === 0 || fireCycle === 3 || fireCycle === 6) {
+                                const angleRad = h.rotation * (Math.PI / 180);
+                                const muzzleDistance = TURRET_STATS.T1_MUZZLE_OFFSET;
+                                const spawnX = turretCenterX + Math.cos(angleRad) * muzzleDistance;
+                                const spawnY = turretCenterY + Math.sin(angleRad) * muzzleDistance;
+
+                                projectilesRef.current.push({
+                                    id: performance.now() + Math.random(),
+                                    type: 'turret_bullet',
+                                    x: spawnX,
+                                    y: spawnY,
+                                    vx: Math.cos(angleRad) * 4.5,
+                                    vy: Math.sin(angleRad) * 4.5,
+                                    rotation: h.rotation,
+                                    facing: Math.sign(dx) || 1,
+                                    owner: 'enemy',
+                                    damage: TURRET_STATS.T1_DAMAGE || 5
+                                });
+                            }
+                        }
+                    }
+
+                    // Level 6: Turret Destruction Objective
+                    if (levelId === 6 && h.hp <= 0 && !h.objectiveCounted) {
+                        h.objectiveCounted = true;
+                        setObjectives(obs => obs.map(o => {
+                            if (o.id === 1 && o.status === 'active') {
+                                const nextCount = (o.current || 0) + 1;
+                                const isDone = nextCount >= (o.target || 2);
+                                return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                            }
+                            return o;
+                        }));
+                    }
+                    if (h.hurtFlash > 0) h.hurtFlash--;
+                } else if (h.type === 'turret_left') {
+                    if (frameCount % (h.fireRate || 90) === 0) {
+                        projectilesRef.current.push({
+                            id: performance.now() + Math.random(),
+                            type: 'cannonball',
+                            x: h.x - 2,
+                            y: h.y + 4,
+                            vx: -1.5,
+                            vy: 0,
+                            facing: -1,
+                            owner: 'enemy',
+                            bounces: 0,
+                            life: 150,
+                            damage: 15
+                        });
+                    }
+                }
+
+                if (h.type === 'spikes') {
+                    // Initialize patrol vector if not present
+                    if (h.vx === undefined) h.vx = HAZARD_STATS.SPIKE_SPEED || 0.45;
+
+                    // Patrol Oscillation
+                    h.x += h.vx;
+                    const [minX, maxX] = HAZARD_STATS.SPIKE_PATROL_RANGE || [140, 200];
+                    if (h.x >= maxX) h.vx = -Math.abs(h.vx);
+                    if (h.x <= minX) h.vx = Math.abs(h.vx);
+                }
+
+                // Touch Damage Logic (Excluding non-contact hazards like Turrets)
+                if (h.type !== 'turret_top' && h.type !== 'turret_left') {
+                    const dx = Math.abs(nextX - h.x);
+                    const dy = nextY - h.y;
+
+                    // Tight Contact Matrix: Precisely wrapping the visual width (w) and world height (hw)
+                    const boundX = (h.w || 6) / 2;
+                    const boundYMin = -12; // Player height bottom offset
+                    const boundYMax = (h.hw || 12); // Spike height top offset
+
+                    if (dx < boundX && dy >= boundYMin && dy < boundYMax) {
+                        if (hurtTimerRef.current <= 0 && hpRef.current > 0) {
+                            const damage = h.type === 'spikes' ? PLAYER_STATS.SPIKE_DAMAGE_THRESHOLD : 25;
+                            hpRef.current = Math.max(0, hpRef.current - damage);
+                            setHp(hpRef.current);
+                            hurtTimerRef.current = 24;
+                            setIsHurtFlash(true);
+                        }
+                    }
+                }
+            });
+
+            (enemiesRef.current || []).forEach(e => {
+                if (e.hasDroppedAmmo) {
+                    const dx = Math.abs(nextX - e.x);
+                    const dy = nextY - e.y;
+                    if (dx < 4 && dy >= -5 && dy < 15) {
+                        e.hasDroppedAmmo = false;
+                        setEnemies(prev => prev.map(enemy =>
+                            enemy.id === e.id ? { ...enemy, hasDroppedAmmo: false } : enemy
+                        ));
+                        ammoRef.current += PLAYER_STATS.DROPPED_MAGAZINE_AMMO;
+                        setAmmo(ammoRef.current);
+                    }
+                }
+            });
+
+            // Integrated Raider Squad AI: Non-blocking 60fps simulation
+            setEnemies(prev =>
+                (prev || []).map(e => {
+                    if (!e) return e;
+                    const nextE = updateEnemyForTick(e, {
+                        levelData: levelDataRef.current,
+                        posRef,
+                        projectilesRef,
+                        difficulty,
+                        hpRef,
+                        setHp,
+                        velRef,
+                        playerState: playerStateRef.current,
+                        playerStateRef,
+                        isShieldActiveRef,
+                        setPlayerState,
+                        setPlayerFrame,
+                        currentEnemies: prev,
+                        hurtTimerRef,
+                        setIsHurtFlash,
+                        cameraX: cameraXRef.current,
+                        playerFacingRef,
+                        levelId,
+                        onShieldContact: () => {
+                            if (levelId === 8 && !shieldedZombiesRef.current.has(e.id)) {
+                                shieldedZombiesRef.current.add(e.id);
+                                setObjectives(obs => obs.map(o => {
+                                    if (o.id === 1 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 5);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                }));
+                            }
+                        }
+                    });
+
+                    // Scoring Transition: Catch deaths from environment/abyss updates
+                    if (e.hp > 0 && nextE.hp <= 0) {
+                        const isZombie = e.type.startsWith('z');
+                        const points = isZombie
+                            ? (ENEMY_STATS.ZOMBIE_POINTS[e.type] || 0)
+                            : (ENEMY_STATS.RAIDER_POINTS[e.type] || 0);
+                        scoreRef.current += points;
+                        setScore(scoreRef.current);
+                        if (levelId === 2 && isZombie) {
+                            ammoRef.current += PLAYER_STATS.DROPPED_MAGAZINE_AMMO;
+                            setAmmo(ammoRef.current);
+
+                            setObjectives(obs => {
+                                const newObs = obs.map(o => {
+                                    if (o.id === 1) {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 20);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+
+                                // Chain reaction: If Obj 1 just finished, activate Obj 2
+                                const obj1 = newObs.find(o => o.id === 1);
+                                if (obj1 && obj1.status === 'complete') {
+                                    return newObs.map(o => (o.id === 2 && o.status === 'pending') ? { ...o, status: 'active' } : o);
+                                }
+                                return newObs;
+                            });
+                        }
+                    }
+
+                    return nextE;
+                })
+            );
+
+            levelData.checkpoints.forEach(cp => {
+                if (Math.abs(nextX - cp.x) < 5 && activeCheckpointId !== cp.id) {
+                    setActiveCheckpointId(cp.id);
+                    setCheckpointPos({ x: cp.x, y: nextY });
+                    setLivesAtCheckpoint(0);
+
+                    checkpointRegistry.current = {
+                        hp: hpRef.current,
+                        ammo: ammoRef.current,
+                        mag: magRef.current,
+                        score: scoreRef.current,
+                        collectedKeys: [...collectedKeysRef.current],
+                        collectedCoins: [...collectedCoinsRef.current],
+                        collectedKits: [...collectedKitsRef.current],
+                        enemies: [...enemies],
+                        objectives: [...objectives]
+                    };
+                }
+            });
+
+            // Precise soldier animation: using calibrated global constants
+            const fastAnimStates = ['dead', 'hurt', 'shoot', 'attack', 'recharge', 'grenade', 'run'];
+            const animSpeed = fastAnimStates.includes(playerStateRef.current) ? PLAYER_STATS.PLAYER_ANIM_COMBAT : PLAYER_STATS.PLAYER_ANIM_DEFAULT;
+            if (frameCount % 4 === 0) {
+                setKeyFrame(f => (f >= 3 ? 0 : f + 1));
+                setCoinFrame(f => (f >= 3 ? 0 : f + 1));
+            }
+            if (frameCount % animSpeed === 0) {
+                setPlayerFrame(f => {
+                    const maxFrames = { idle: 6, walk: 7, run: 5, jump: 5, attack: 4, recharge: 7, shoot: 3, dead: 4, hurt: 3, grenade: 7 };
+                    const curState = playerStateRef.current;
+
+
+
+                    const currentMax = maxFrames[curState] || 0;
+                    if (f >= currentMax) {
+                        if (['attack', 'recharge', 'shoot', 'hurt', 'grenade'].includes(curState)) {
+                            if (curState === 'recharge') {
+                                const reloadAmount = Math.min(magSize - magRef.current, ammoRef.current);
+                                magRef.current += reloadAmount;
+                                ammoRef.current -= reloadAmount;
+                                setCurrentMag(magRef.current);
+                                setAmmo(ammoRef.current);
+                            } else if (curState === 'grenade') {
+                                // Spawning Projectile on completion
+                                const shotFacing = playerFacingRef.current;
+                                // Smart Grenade Targeting: Identify nearest hostile in facing direction
+                                const targetEnemy = (enemiesRef.current || [])
+                                    .filter(e => e.hp > 0 && Math.sign(e.x - posRef.current.x) === shotFacing)
+                                    .sort((a, b) => Math.abs(a.x - posRef.current.x) - Math.abs(b.x - posRef.current.x))[0];
+
+                                let effectX = posRef.current.x + (shotFacing * 5);
+                                let effectY = posRef.current.y + 18;
+                                let isSmartDrop = false;
+
+                                if (targetEnemy) {
+                                    effectX = targetEnemy.x;
+                                    effectY = targetEnemy.y + 12.0; // Optimized vertical strike point for ground burst
+                                    isSmartDrop = true;
+                                }
+
+                                projectilesRef.current.push({
+                                    id: performance.now() + Math.random(),
+                                    type: 'grenade_fuse',
+                                    x: effectX,
+                                    y: effectY,
+                                    vx: isSmartDrop ? 0 : shotFacing * 2.8, // Direct drop if targeting enemy
+                                    vy: isSmartDrop ? -0.5 : 4.0, // Tactical ballistic arc
+                                    facing: shotFacing,
+                                    owner: 'player',
+                                    bounces: 0,
+                                    life: isSmartDrop ? 4 : 18 // Near-instant detonation on targeted deployment
+                                });
+                                grenadesRef.current = Math.max(0, grenadesRef.current - 1);
+                                setGrenades(grenadesRef.current);
+                            }
+
+                            playerStateRef.current = 'idle';
+                            setPlayerState('idle');
+                            return 0;
+                        }
+                        if (curState === 'dead') {
+                            if (levelId === 3) {
+                                // Handled by GameScreen effect for immediate total reset
+                                return f;
+                            }
+                            if (livesAtCheckpoint < 2) {
+                                if (respawnTimer === 0) setRespawnTimer(3);
+                            } else {
+                                setIsGameOver(true);
+                            }
+                            return f;
+                        }
+                        return 0;
+                    }
+                    return f + 1;
+                });
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        };
+
+        animationFrameId = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [
+        isGameOver,
+        isLevelComplete,
+        respawnTimer,
+        isDebriefOpen,
+        isPauseOpen,
+        magSize,
+        difficulty,
+        livesAtCheckpoint,
+        levelId
+    ]);
+};
+
+export default useGameLoop;
+
