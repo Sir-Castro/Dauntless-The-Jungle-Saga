@@ -1,62 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { AdMob, RewardAdPluginEvents } from '@capacitor-community/admob';
+import React, { useState, useEffect } from 'react';
+import { AdMobManager } from '../../utils/AdMobManager';
 import './MainMenu.css';
 
 const MainMenu = ({ onStartMission, onOpenArsenal, onOpenArchives, playerProgress = 1, onToggleDebug, debugMode, totalCoins = 0, onDoubleCoins }) => {
     const [isPreparingAd, setIsPreparingAd] = useState(false);
     const [adErrorVisible, setAdErrorVisible] = useState(false);
-    const onDoubleCoinsRef = useRef(onDoubleCoins);
 
     useEffect(() => {
-        onDoubleCoinsRef.current = onDoubleCoins;
-    }, [onDoubleCoins]);
-
-    useEffect(() => {
-        let listenerHandle = null;
-        let isMounted = true;
-
-        const setupAdMob = async () => {
-            try {
-                await AdMob.initialize();
-                if (!isMounted) return;
-
-                listenerHandle = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem) => {
-                    console.log('User earned reward!', rewardItem);
-                    if (onDoubleCoinsRef.current) {
-                        onDoubleCoinsRef.current(rewardItem);
-                    }
-                });
-            } catch (err) {
-                console.error("AdMob Setup Error: ", JSON.stringify(err));
-            }
-        };
-        
-        setupAdMob();
-        
-        return () => {
-            isMounted = false;
-            if (listenerHandle) {
-                listenerHandle.remove();
-            }
-        };
-    }, []);
+        AdMobManager.init(debugMode);
+    }, [debugMode]);
 
     const handleWatchAd = async () => {
         if (isPreparingAd) return;
+
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+            setAdErrorVisible(true);
+            return;
+        }
+
         try {
             setIsPreparingAd(true);
+            const adUnitId = AdMobManager.getAdUnitId(debugMode);
 
-            const testAdId = 'ca-app-pub-3940256099942544/5224354917'; // Google's sample Android rewarded ad unit
-            const productionAdId = 'ca-app-pub-4926715486042434/6089872952';
-
-            await AdMob.prepareRewardVideoAd({
-                adId: debugMode ? testAdId : productionAdId,
-                isTesting: debugMode
-            });
-
-            await AdMob.showRewardVideoAd();
+            await AdMobManager.showRewardedAd(
+                adUnitId,
+                (rewardItem) => {
+                    console.log('User earned reward!', rewardItem);
+                    if (onDoubleCoins) {
+                        onDoubleCoins(rewardItem);
+                    }
+                },
+                debugMode
+            );
         } catch (err) {
-            const errorMessage = err.message || err.toString();
+            const errorMessage = err?.message || err?.toString();
             console.error("Failed to show AdMob rewarded video", errorMessage);
             setAdErrorVisible(true);
         } finally {

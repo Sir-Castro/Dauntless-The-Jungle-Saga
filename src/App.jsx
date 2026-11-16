@@ -96,6 +96,10 @@ function App() {
     }
 
 
+    const handleDoubleCoins = React.useCallback(() => {
+        setTotalCoins(prev => prev > 0 ? prev * 2 : 100);
+    }, []);
+
     const handleLevelComplete = React.useCallback((id, pointsEarned = 0) => {
         setTotalCoins(prev => prev + pointsEarned);
         const nextLevel = id + 1;
@@ -205,7 +209,7 @@ function App() {
                         onToggleDebug={() => setDebugMode(!debugMode)}
                         debugMode={debugMode}
                         totalCoins={totalCoins}
-                        onDoubleCoins={() => setTotalCoins(prev => prev > 0 ? prev * 2 : 100)}
+                        onDoubleCoins={handleDoubleCoins}
                     />
                 )}
 
