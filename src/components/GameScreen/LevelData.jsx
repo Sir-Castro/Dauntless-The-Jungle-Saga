@@ -100,19 +100,21 @@ export const getMissionData = (id) => {
         // ... remaining levelLayouts definitions identical to current GameScreen.jsx ...
     };
 
-    const layout = levelLayouts[id] || levelLayouts[2] || levelLayouts[1];
+    const layout = levelLayouts[id] || {};
 
+    const clonedLayout = JSON.parse(JSON.stringify(layout));
+    
     return {
         difficulty: difficultyMod,
-        objectives: missionObjectives[id] || missionObjectives[1],
+        objectives: JSON.parse(JSON.stringify(missionObjectives[id] || [])),
         enemies: (missionEnemies[id] || missionEnemies[2] || missionEnemies[1]).map(e => ({ ...e, maxHp: e.hp })),
         levelData: {
-            ...layout,
-            platforms: layout.platforms || [],
-            interactables: layout.interactables || [],
-            checkpoints: layout.checkpoints || [],
-            hazards: layout.hazards || [],
-            decor: layout.decor || []
+            ...clonedLayout,
+            platforms: clonedLayout.platforms || [],
+            interactables: clonedLayout.interactables || [],
+            checkpoints: clonedLayout.checkpoints || [],
+            hazards: clonedLayout.hazards || [],
+            decor: clonedLayout.decor || []
         }
     };
 };

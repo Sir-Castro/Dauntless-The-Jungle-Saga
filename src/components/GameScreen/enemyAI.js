@@ -23,7 +23,10 @@ export function updateEnemyForTick(e, context) {
         setPlayerFrame,
         hurtTimerRef,
         setIsHurtFlash,
-        isShieldActiveRef
+        isShieldActiveRef,
+        playSoundIfVisible,
+        SOUNDS,
+        VOLUME_CONFIG
     } = context;
 
     const dynamicMax = (maxFramesMap[e.type] && maxFramesMap[e.type][e.state]) || 0;
@@ -60,7 +63,8 @@ export function updateEnemyForTick(e, context) {
         if (blockedTicks <= 0) blockedTargetId = null;
     }
 
-    const colliderHalfWidth = 2.0;
+    const groundColliderHalfWidth = 0.2;
+    const wallColliderHalfWidth = 2.0;
     const verticalOffset = 2.5;
 
     const getPlatWidth = (p) => {
@@ -84,6 +88,7 @@ export function updateEnemyForTick(e, context) {
             if (p.id === 'g4') return baseTop - ((1.0 - clampedVal) * height);
             return baseTop - (clampedVal * height);
         }
+        if (p.id === 'g1') return baseTop + 3.0;
         return baseTop;
     };
 
@@ -95,11 +100,11 @@ export function updateEnemyForTick(e, context) {
             const extraMargin = ['g8', 'g9'].includes(p.id) ? 0.8 : 0;
             const platW = getPlatWidth(p);
             const platTop = getPlatTop(p, tx);
-            return tx >= (p.x - colliderHalfWidth - extraMargin) && tx <= (p.x + platW + colliderHalfWidth + extraMargin) && Math.abs(e.y - platTop) < tolerance;
+            return tx >= (p.x - groundColliderHalfWidth - extraMargin) && tx <= (p.x + platW + groundColliderHalfWidth + extraMargin) && Math.abs(e.y - platTop) < tolerance;
         });
         const onGroundFloor = e.y < 5.0 && levelData.platforms.some(p => {
             const platW = getPlatWidth(p);
-            return p.type === 'floor' && tx >= (p.x - colliderHalfWidth) && tx <= (p.x + platW + colliderHalfWidth);
+            return p.type === 'floor' && tx >= (p.x - groundColliderHalfWidth) && tx <= (p.x + platW + groundColliderHalfWidth);
         });
         return onStructure || onGroundFloor;
     };
@@ -109,7 +114,7 @@ export function updateEnemyForTick(e, context) {
             const pw = getPlatWidth(p);
             const pTop = getPlatTop(p, tx);
             const extraMargin = ['g8', 'g9'].includes(p.id) ? 0.8 : 0;
-            return tx >= (p.x - colliderHalfWidth - extraMargin) && tx <= (p.x + pw + colliderHalfWidth + extraMargin) && pTop < ty - 2;
+            return tx >= (p.x - groundColliderHalfWidth - extraMargin) && tx <= (p.x + pw + groundColliderHalfWidth + extraMargin) && pTop < ty - 2;
         });
         if (platformsBelow.length === 0) return null;
         return platformsBelow.reduce((max, p) => (getPlatTop(p, tx) > getPlatTop(max, tx) ? p : max), platformsBelow[0]);
@@ -420,9 +425,9 @@ export function updateEnemyForTick(e, context) {
         const platW = getPlatWidth(p);
         const platTop = getPlatTop(p, nextX);
         const extraMargin = ['g8', 'g9'].includes(p.id) ? 0.8 : 0;
-        if (nextX >= p.x - colliderHalfWidth - extraMargin && nextX <= p.x + platW + colliderHalfWidth + extraMargin) {
+        if (nextX >= p.x - groundColliderHalfWidth - extraMargin && nextX <= p.x + platW + groundColliderHalfWidth + extraMargin) {
             const isSlope = ['g2', 'g4', 'g3', 'g5'].includes(p.id);
-            const catchRange = isSlope ? 8.0 : 2.5;
+            const catchRange = isSlope ? 8.0 : 4.5;
 
             if (e.y >= platTop - catchRange && enemyY <= platTop && enemyY >= platTop - 18.0) {
                 enemyY = platTop;
@@ -461,8 +466,8 @@ export function updateEnemyForTick(e, context) {
         if (p.type === 'floor') return;
         const pTop = getPlatTop(p, nextX);
         if (enemyY < pTop && enemyY + 15 > p.y) {
-            if (nextX + colliderHalfWidth > p.x && nextX - colliderHalfWidth < p.x + getPlatWidth(p)) {
-                nextX = (nextX < p.x + getPlatWidth(p) / 2) ? p.x - colliderHalfWidth : p.x + getPlatWidth(p) + colliderHalfWidth;
+            if (nextX + wallColliderHalfWidth > p.x && nextX - wallColliderHalfWidth < p.x + getPlatWidth(p)) {
+                nextX = (nextX < p.x + getPlatWidth(p) / 2) ? p.x - wallColliderHalfWidth : p.x + getPlatWidth(p) + wallColliderHalfWidth;
             }
         }
     });
@@ -476,6 +481,9 @@ export function updateEnemyForTick(e, context) {
         const bulletDmg = e.type === 'raider1' ? ENEMY_STATS.RAIDER1_DAMAGE : ENEMY_STATS.RAIDER2_DAMAGE;
 
         if (e.type === 'raider1') {
+            if (playSoundIfVisible && SOUNDS && VOLUME_CONFIG) {
+                playSoundIfVisible(SOUNDS.RAIDER1_SHOT, nextX, VOLUME_CONFIG.RAIDER_SHOT);
+            }
             // Parallel Formation: 3-round vertical spread for area suppression
             [0, 2.5, -2.5].forEach((yOff, i) => {
                 projectilesRef.current.push({
@@ -490,6 +498,9 @@ export function updateEnemyForTick(e, context) {
                 });
             });
         } else {
+            if (playSoundIfVisible && SOUNDS && VOLUME_CONFIG) {
+                playSoundIfVisible(SOUNDS.RAIDER2_SHOT, nextX, VOLUME_CONFIG.RAIDER_SHOT);
+            }
             // Serial Formation: 3-round burst (staggered X offsets)
             [0, -4.5, -9.0].forEach((xOff, i) => {
                 projectilesRef.current.push({
@@ -545,8 +556,8 @@ export function updateEnemyForTick(e, context) {
         velY: enemyVelY,
         isGrounded: enemyIsGrounded,
         facing: nextFacing,
-        state: nextState,
-        frame: nextFrame,
+        state: nextState || 'idle',
+        frame: nextFrame || 0,
         waitTicks: waitTicks,
         hp: e.hp,
         ammo: nextAmmo,

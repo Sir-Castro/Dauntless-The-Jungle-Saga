@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LevelCompleteModal = ({ isLevelComplete, levelId, collectedCoins, onExit, onProceed }) => {
+const LevelCompleteModal = ({ isLevelComplete, levelId, collectedCoins, score, onExit, onProceed }) => {
     if (!isLevelComplete) return null;
 
     return (
@@ -26,15 +26,12 @@ const LevelCompleteModal = ({ isLevelComplete, levelId, collectedCoins, onExit, 
                 </div>
 
                 <div className="status-label">MISSION_ACCOMPLISHED</div>
-                <h2 className="modal-title">OBJECTIVE SECURED</h2>
-                <p className="modal-desc">
-                    Sector 0{levelId} cleared.
-                </p>
+                <h2 className="modal-title">LEVEL SECURED</h2>
 
                 <div className="mission-stats">
                     <div className="stat-line central">
-                        <span className="stat-coin-icon"></span>
-                        <span className="stat-highlight">{collectedCoins.length * 250}</span>
+                        <span className="stat-label">POINTS:</span>
+                        <span className="stat-highlight">{score}</span>
                     </div>
                 </div>
 

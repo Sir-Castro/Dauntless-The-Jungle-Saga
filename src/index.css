@@ -3,8 +3,8 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* Responsive Scaling Manifest */
-  font-size: clamp(8px, 1.1vw, 20px);
+  /* Responsive Scaling Manifest - Aspect Ratio Aware */
+  font-size: clamp(8px, min(1.1vw, 1.955vh), 100px);
 
   /* Lush Green Forest Combat Palette */
   --bg-dark: #0a0e0c;
@@ -43,14 +43,22 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
+  justify-content: center;
+  align-items: center;
   min-width: 320px;
   min-height: 100vh;
   overflow: hidden;
+  -webkit-touch-callout: none;
+  user-select: none;
+  background-color: #000;
 }
 
 #root {
   width: 100vw;
   height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 * {

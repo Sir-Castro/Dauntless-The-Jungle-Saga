@@ -1,13 +1,83 @@
 import React, { useState, useEffect } from 'react';
+import { AdMob, RewardAdPluginEvents } from '@capacitor-community/admob';
 import './MainMenu.css';
 
-const MainMenu = ({ onStartMission, onOpenArsenal, onOpenArchives, playerProgress = 1, onToggleDebug, debugMode }) => {
+const MainMenu = ({ onStartMission, onOpenArsenal, onOpenArchives, playerProgress = 1, onToggleDebug, debugMode, totalCoins = 0, onDoubleCoins }) => {
+    const [isPreparingAd, setIsPreparingAd] = useState(false);
+    const [adErrorVisible, setAdErrorVisible] = useState(false);
+
+    useEffect(() => {
+        let isSetup = false;
+        const setupAdMob = async () => {
+            try {
+                await AdMob.initialize();
+                
+                AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem) => {
+                    console.log('User earned reward!', rewardItem);
+                    if (onDoubleCoins) {
+                        onDoubleCoins();
+                    }
+                });
+                isSetup = true;
+            } catch (err) {
+                console.error("AdMob Setup Error: ", JSON.stringify(err));
+            }
+        };
+        
+        setupAdMob();
+        
+        return () => {
+            if (isSetup) {
+                AdMob.removeAllListeners();
+            }
+        };
+    }, [onDoubleCoins]);
+
+    const handleWatchAd = async () => {
+        if (isPreparingAd) return;
+        try {
+            setIsPreparingAd(true);
+
+            const testAdId = 'ca-app-pub-3940256099942544/5224354917'; // Google's sample Android rewarded ad unit
+            const productionAdId = 'ca-app-pub-4926715486042434/6089872952';
+
+            await AdMob.prepareRewardVideoAd({
+                adId: debugMode ? testAdId : productionAdId,
+                isTesting: debugMode
+            });
+
+            await AdMob.showRewardVideoAd();
+        } catch (err) {
+            const errorMessage = err.message || err.toString();
+            console.error("Failed to show AdMob rewarded video", errorMessage);
+            setAdErrorVisible(true);
+        } finally {
+            setIsPreparingAd(false);
+        }
+    };
+
     return (
         <div className="main-menu-modern-overlay">
-            <button className={`settings-btn-main ${debugMode ? 'debug-active' : ''}`} onClick={onToggleDebug} title="Toggle Debug Mode">
-                <img src="/buttons/Settings.png" alt="Settings" />
-                {debugMode && <div style={{position: 'absolute', top: -10, right: -10, background: 'red', color: 'white', padding: '2px 5px', fontSize: 10, borderRadius: 3, fontWeight: 'bold'}}>DEBUG</div>}
-            </button>
+
+            <div className="main-menu-ad-banner" onClick={handleWatchAd}>
+                <div className="main-menu-ad-header">
+                    {isPreparingAd ? (
+                        <svg className="main-menu-ad-icon spinning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+                        </svg>
+                    ) : (
+                        <img src="/coin/coin0.png" alt="Coins" className="main-menu-ad-icon" />
+                    )}
+                    <span className="main-menu-ad-title">
+                        {isPreparingAd ? 'Loading...' : 'X 2'}
+                    </span>
+                </div>
+            </div>
+
+            <div className="main-menu-coin-counter">
+                <img src="/coin/coin0.png" alt="Coins" className="main-menu-coin-icon" />
+                <span className="main-menu-coin-text">{totalCoins}</span>
+            </div>
 
             <div className="menu-content-center">
 
@@ -36,6 +106,16 @@ const MainMenu = ({ onStartMission, onOpenArsenal, onOpenArchives, playerProgres
                     </div>
                 </div>
             </div>
+
+            {adErrorVisible && (
+                <div className="ad-error-overlay">
+                    <div className="ad-error-dialog">
+                        <h3>Ad Unavailable</h3>
+                        <p>Please try again later</p>
+                        <button className="ad-error-btn" onClick={() => setAdErrorVisible(false)}>OK</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

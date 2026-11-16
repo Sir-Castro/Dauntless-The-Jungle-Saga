@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copyright Registration Document - Dauntless: The Jungle Saga</title>
+    <style>
+        :root {
+            --primary: #1e3d2f;
+            --secondary: #2c5e43;
+            --accent: #d35400;
+            --text: #333;
+            --bg: #fff;
+            --muted: #7f8c8d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 40px;
+        }
+
+        .page {
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 50px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px double var(--primary);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 5px 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transform: rotate(5deg);
+            opacity: 0.6;
+            font-size: 12px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: var(--secondary);
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: var(--muted);
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-size: 15px;
+        }
+
+        .content-box {
+            background: #fcfcfc;
+            border: 1px solid #efefef;
+            padding: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .list-items {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .list-items li {
+            margin-bottom: 8px;
+        }
+
+        .tech-summary {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .signature-line {
+            margin-top: 0;
+            border-top: 1px solid #333;
+            width: 250px;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .signature-caption {
+            display: block;
+            margin-top: 5px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .page {
+                border: none;
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Essential Print Styling */
+        @media print {
+            @page {
+                margin: 1cm;
+            }
+
+            body {
+                padding: 0;
+                background: none;
+            }
+
+            .page {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            /* Custom Page Footer */
+            .print-footer {
+                display: block !important;
+                /* Ensure visibility for PDF export */
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                font-size: 10px;
+                color: #7f8c8d;
+                border-top: 0.5px solid #eee;
+                padding-top: 5px;
+                background: white;
+            }
+        }
+
+        .signature-caption-data,
+        .signature-date-data {
+            display: block;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: -8px;
+            /* Pulled the line closer to the text */
+            color: var(--primary);
+        }
+
+        .signature-caption,
+        .signature-date {
+            display: block;
+            margin-top: 5px;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+    </style>
+    <!-- Use a LOCAL copy for reliability -->
+    <script src="html2pdf.bundle.min.js"></script>
+    <script>
+        function generatePDF() {
+            if (typeof html2pdf === 'undefined') {
+                window.print();
+                return;
+            }
+
+            const element = document.querySelector('.page');
+            const footer = document.querySelector('.print-footer');
+
+            // Show footer temporarily for capture
+            footer.style.display = 'block';
+
+            const opt = {
+                margin: 0.5,
+                filename: 'Dauntless_TheJungleSaga_Copyright.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            const btn = document.querySelector('.pdf-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "GENERATING PDF...";
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                footer.style.display = 'none'; // Re-hide
+            }).catch(err => {
+                console.error("PDF Generation failed", err);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                footer.style.display = 'none';
+                window.print();
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="page">
+
+        <header>
+            <h1>Formal Copyright Declaration</h1>
+            <p>Interactive Computer Program & Audiovisual Work</p>
+            <p style="font-size: 16px; margin-top: 10px; color: var(--primary);"><strong>Version: 1.0.0 (Stable
+                    Release)</strong></p>
+        </header>
+
+        <section>
+            <h2>General Identification</h2>
+            <div class="grid">
+                <div class="label">Title of Work:</div>
+                <div class="value"><strong>Dauntless: The Jungle Saga</strong></div>
+
+                <div class="label">Software Version:</div>
+                <div class="value"><strong>v1.0.0</strong></div>
+
+                <div class="label">Author / Creator:</div>
+                <div class="value"><strong>Fidel Mbeo</strong></div>
+
+                <div class="label">Copyright Owner:</div>
+                <div class="value"><strong>Fidel Mbeo</strong></div>
+
+                <div class="label">Type of Work:</div>
+                <div class="value">Computer Software / Mobile Game</div>
+
+                <div class="label">Platform:</div>
+                <div class="value">Android (Google Play Store) / Capacitor Runtime</div>
+
+                <div class="label">Store Link:</div>
+                <div class="value"><a href="https://play.google.com/store/apps/details?id=com.fidel.dauntless"
+                        style="color: #2c3e50; text-decoration: none; border-bottom: 1px dashed #2c3e50;">https://play.google.com/store/apps/details?id=com.fidel.dauntless</a>
+                </div>
+
+                <div class="label">Creation Date:</div>
+                <div class="value">July 29, 2026</div>
+
+                <div class="label">Territory:</div>
+                <div class="value">Worldwide / Universal</div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Abstract</h2>
+            <div class="content-box">
+                <p><strong>Purpose:</strong> <em>Dauntless: The Jungle Saga</em> is an interactive 2D side-scrolling
+                    action-shooter and platformer game designed to provide high-stakes combat through a hazardous jungle environment. It serves as both an entertainment medium and a technical demonstration of projectile physics, AI systems, and real-time collision detection.</p>
+                <p><strong>Technologies:</strong> The work is built upon a proprietary 2D Canvas-based rendering engine
+                    implemented in <strong>JavaScript (ES2023+)</strong> and <strong>React 18</strong>. It utilizes the
+                    <strong>Capacitor 8.0</strong> runtime for mobile deployment and <strong>Vite 5</strong> for optimized state management and asset
+                    delivery.
+                </p>
+                <p><strong>Platforms:</strong> Primary deployment target is Android (API Level 24+), with architectural
+                    support for Progressive Web App (PWA) distributions.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Introduction</h2>
+            <div class="content-box">
+                <p>
+                    Developed as a modern homage to classic run-and-gun platformers, <em>Dauntless: The Jungle Saga</em>
+                    pushes the boundaries of web-based game engines with its implementation of Continuous Collision Detection (CCD) for high-speed projectiles and dynamic AI behaviors for raiders, zombies, and defensive turrets. This documentation outlines the software's functional logic, visual presentation, and underlying source code for the purpose of copyright registration and archival.
+                </p>
+                <p>
+                    The following sections provide a sequenced walkthrough of the software's operational flow, from
+                    initialization through to the core combat loop, level objectives, and victory states.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Functional Documentation (User Interface & Workflow)</h2>
+            <div class="content-box">
+                <p style="margin-bottom: 15px;"><strong>1. Access, Initialization & Loading:</strong> The software
+                    begins with a high-performance <strong>Splash Screen</strong> that initializes the asset pipeline
+                    and pre-fetches game states. This ensures a seamless transition into the interactive environment.</p>
+
+                <div class="grid" style="grid-template-columns: 150px 1fr; margin-bottom: 10px;">
+                    <div class="label">Menu Navigation:</div>
+                    <div class="value">The <strong>Main Menu</strong> serves as the central hub, providing access to
+                        "Level Selection", "Achievements", and player settings.
+                    </div>
+
+                    <div class="label">Core Mechanics:</div>
+                    <div class="value">Engagement relies on fluid character movement (running, jumping), intense shooting mechanics, dodging vertical turret bursts, and utilizing grenades against varying enemy types like raiders and zombies. Continuous Collision Detection ensures fair gameplay.</div>
+
+                    <div class="label">Progression Hub:</div>
+                    <div class="value">Players advance through multiple stages and levels, each with distinct environments and objectives (e.g., Turret Destruction, Zombie Elimination).</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Nature of Authorship</h2>
+            <div class="content-box">
+                This registration claims copyright over the entire creative and technical expression of the work,
+                specifically including:
+                <ul class="list-items">
+                    <li><strong>Proprietary Source Code:</strong> Advanced combat state-machines, unique AI behavioral
+                        logic for diverse enemy types (raiders, zombies, turrets), and a custom physics engine with Continuous Collision Detection (CCD) written in
+                        JavaScript/React.</li>
+                    <li><strong>Original Visual Presentation:</strong> Custom environment mapping, stylized world
+                        layouts, and visual feedback for hit impacts and damage processing.</li>
+                    <li><strong>Technical Systems:</strong> A comprehensive game loop manager, level objective tracking system, and original interactive UI/HUD designs.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Visual Documentation (Work Screenshots)</h2>
+            <div class="content-box">
+                <p style="margin-bottom: 20px; font-style: italic; font-size: 13px;">The following screenshots are
+                    sequenced to illustrate the software's functional flow: Initialization (Splash Screen) → Navigation
+                    (Main Menu/Stages) → Operation (Combat) → Terminus (Victory/Goal).</p>
+                <style>
+                    .screenshot-grid {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 10px;
+                    }
+
+                    .screenshot-item {
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        overflow: hidden;
+                        background: #eee;
+                        min-height: 100px;
+                    }
+
+                    .screenshot-item img {
+                        width: 100%;
+                        height: auto;
+                        display: block;
+                    }
+
+                    .screenshot-label {
+                        font-size: 9px;
+                        text-align: center;
+                        padding: 3px;
+                        background: #fff;
+                        color: #777;
+                        border-top: 1px solid #ddd;
+                    }
+                </style>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item"><img src="screenshots/Splash Screen.jpeg" alt="Splash Screen">
+                        <div class="screenshot-label">This is the Splash Screen during initial load.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Main Menu.jpeg" alt="Main Menu">
+                        <div class="screenshot-label">This is the Main Menu interface.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Level Selection.jpeg" alt="Level Selection">
+                        <div class="screenshot-label">This is the Level Selection screen showing progression.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Gameplay 1.jpeg" alt="Gameplay 1">
+                        <div class="screenshot-label">This is a screenshot of early Jungle stage gameplay.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Combat.jpeg" alt="Combat">
+                        <div class="screenshot-label">This is a screenshot of combat against Raiders.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/10.jpeg" alt="Combat 2">
+                        <div class="screenshot-label">This is a screenshot of dodging Turret bursts.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Zombies.jpeg" alt="Zombies">
+                        <div class="screenshot-label">This is a screenshot of an encounter with Zombies.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Victory.jpeg" alt="Victory">
+                        <div class="screenshot-label">This is the Victory / Level Complete overlay.</div>
+                    </div>
+                    <div class="screenshot-item"><img src="screenshots/Game Over.jpeg" alt="Game Over">
+                        <div class="screenshot-label">This is the Game Over / Defeat overlay.</div>
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: var(--muted); margin-top: 10px; text-align: center;">
+                    <em>Figures 1-9: Sequential visual documentation of the software architecture and user flow.</em>
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Technical Architecture Summary</h2>
+            <div class="tech-summary">
+                CORE LANGUAGE: JavaScript (ECMAScript 2023+)<br>
+                FRAMEWORK: React 18.2.0 / Vite 5.2.0<br>
+                MOBILE RUNTIME: Capacitor 8.1.0 (Android Bridge)<br>
+                ENGINE: Proprietary 2D Canvas-based Rendering Engine with CCD Physics<br>
+                STATE MANAGEMENT: React Hooks<br>
+                ASSETS: Custom Rasterized Pixel Art (.png), CSS3 Visual Transforms<br>
+                LEVELS: Multiple jungle-themed stages with dynamic objectives
+            </div>
+        </section>
+
+        <section>
+            <h2>Source Code Documentation (Samples)</h2>
+            <div class="content-box">
+                <style>
+                    .source-code-grid {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 20px;
+                    }
+
+                    .source-item {
+                        border: 1px solid #eee;
+                        padding: 10px;
+                        background: #fff;
+                        border-radius: 4px;
+                    }
+
+                    .source-item img {
+                        width: 100%;
+                        height: auto;
+                        border: 1px solid #ddd;
+                        margin-bottom: 8px;
+                    }
+
+                    .source-desc {
+                        font-size: 12px;
+                        color: #555;
+                        line-height: 1.4;
+                    }
+
+                    .source-title {
+                        font-weight: bold;
+                        font-size: 13px;
+                        margin-bottom: 4px;
+                        color: var(--primary);
+                        display: block;
+                    }
+                </style>
+                <div class="source-code-grid">
+                    <div class="source-item">
+                        <span class="source-title">Game Loop & Physics (1/2)</span>
+                        <img src="screenshots/Game Loop and Physics 1.PNG" alt="Game Loop Source 1">
+                        <div class="source-desc">Core physics integration and Continuous Collision Detection (CCD) for projectiles.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Game Loop & Physics (2/2)</span>
+                        <img src="screenshots/Game Loop and Physics 2.PNG" alt="Game Loop Source 2">
+                        <div class="source-desc">Update logic for character state, environment bounds, and frame processing.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Enemy AI Logic (1/2)</span>
+                        <img src="screenshots/Enemy AI Logic 1.PNG" alt="Enemy AI Source 1">
+                        <div class="source-desc">Behavioral state machine for Raiders, handling tracking, attacking, and patrolling.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Enemy AI Logic (2/2)</span>
+                        <img src="screenshots/Enemy AI Logic 2.PNG" alt="Enemy AI Source 2">
+                        <div class="source-desc">Target acquisition and pathfinding algorithms for Zombies and Turrets.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Level Data & Objectives</span>
+                        <img src="screenshots/Level Data.PNG" alt="Level Data Source">
+                        <div class="source-desc">Configuration for level structures, enemy spawns, and completion objectives.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Heads-Up Display (HUD)</span>
+                        <img src="screenshots/Heads up display.PNG" alt="Game HUD Source">
+                        <div class="source-desc">Code for the real-time player status display, including health bars and ammo count.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Main Menu Controller</span>
+                        <img src="screenshots/Main menu controller.PNG" alt="Main Menu Source">
+                        <div class="source-desc">Primary navigation hub, handling entry points for level selection and settings.</div>
+                    </div>
+                    <div class="source-item">
+                        <span class="source-title">Victory / Defeat Overlays</span>
+                        <img src="screenshots/Level Complete Modal.PNG" alt="Overlays Source">
+                        <div class="source-desc">State management for level conclusion, objective validation, and player retry logic.</div>
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: var(--muted); margin-top: 10px; text-align: center;">
+                    <em>Note: The images above represent specific portions of the proprietary source code as part of the formal deposit.</em>
+                </p>
+            </div>
+        </section>
+
+
+        <section>
+            <h2>Disclaimer & Exclusions</h2>
+            <div class="content-box" style="font-size: 12px; color: var(--muted);">
+                The claimant does not own the underlying public-domain frameworks (React, Vite, Capacitor).
+                Furthermore, this claim <strong>explicitly excludes</strong> any third-party licensed 2D character sprite assets or background art assets utilized within the game.
+                <br><br>
+                This claim is restricted to the specific implementation, coding logic, procedural arrangement, physics engine integration, and original interactive systems designed by the author.
+            </div>
+        </section>
+
+        <section>
+            <h2>Declaration</h2>
+            <div class="content-box">
+                <p>I, <strong>Fidel Mbeo</strong>, declare that this work titled <strong>“Dauntless: The Jungle Saga”</strong> is my
+                    original creation and that I am the rightful owner of all intellectual property rights associated
+                    with it.</p>
+
+                <div style="margin-top: 30px;">
+                    <span class="signature-caption-data">Fidel Mbeo</span>
+                    <div class="signature-line" style="width: 250px;"></div>
+                    <span class="signature-caption">Signature</span>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <span class="signature-date-data">July 29, 2026</span>
+                    <div class="signature-line" style="width: 150px;"></div>
+                    <span class="signature-date">Date of Certification</span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+
+            <p>© 2026 Fidel Mbeo. ALL RIGHTS RESERVED. CONFIDENTIAL DOCUMENT.</p>
+        </footer>
+    </div>
+
+    <div class="print-footer"
+        style="display: none; border-top: 1px solid #eee; margin-top: 10px; font-size: 10px; text-align: center; color: var(--muted);">
+        © 2026 Fidel Mbeo • Dauntless: The Jungle Saga • Official Copyright Documentation
+    </div>
+
+    <div class="no-print" style="text-align: center; margin: 60px 0;">
+        <button onclick="generatePDF()" class="pdf-btn"
+            style="padding: 18px 40px; cursor: pointer; background: #1e3d2f; color: white; border: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.3s ease;">
+            GENERATE & DOWNLOAD OFFICIAL PDF
+        </button>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 15px; font-weight: bold; line-height: 1.6;">
+            The direct download takes a moment to process the screenshots.<br>
+            (Fallback: Reverts to standard print dialog if blocked)
+        </p>
+    </div>
+</body>
+
+</html>

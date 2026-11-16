@@ -1,6 +1,7 @@
 import React from 'react';
 import { getSoldierSpriteKey } from './soldierAnimations';
 import { TURRET_STATS } from '../../constants';
+import { getCachedImage } from '../../utils/imageCache';
 
 const LevelWorld = ({
     cameraX,
@@ -38,14 +39,14 @@ const LevelWorld = ({
 
             <div className="level-geometry" style={{ transform: `scale(${worldScale}) translateX(-${cameraX}%)` }}>
                 <div className="platforms-container">
-                    {levelData.platforms.map(p => (
+                    {levelData.platforms.map((p, index) => (
                         <div
-                            key={p.id}
+                            key={`platform-${index}`}
                             className={`platform ${p.type} ${p.id}`}
                             style={{
                                 left: `${p.x}%`,
                                 bottom: `${p.y}%`,
-                                width: `${p.w}%`,
+                                width: `${p.w === 400 ? (['g2', 'g4', 'g3', 'g5'].includes(p.id) ? 7 : 14) : p.w}%`,
                                 height: `${p.h / 10}rem`,
                                 transform: p.rotation ? `rotate(${p.rotation}deg)` : undefined,
                                 transformOrigin: p.rotation ? 'center' : undefined
@@ -65,9 +66,9 @@ const LevelWorld = ({
                 </div>
 
                 <div className="decor-container">
-                    {levelData.decor && levelData.decor.map(d => (
+                    {levelData.decor && levelData.decor.map((d, index) => (
                         <div
-                            key={d.id}
+                            key={`decor-${index}`}
                             className={`decor-item ${d.type} ${d.id}`}
                             style={{
                                 left: `${d.x}%`,
@@ -100,7 +101,7 @@ const LevelWorld = ({
                                 style={{
                                     left: `${i.x}%`,
                                     bottom: `${renderY + 2}%`,
-                                    backgroundImage: `url('${iconPath}')`,
+                                    backgroundImage: `url('${getCachedImage(iconPath)}')`,
                                 }}
                             >
                                 <div className="key-glow-ring"></div>
@@ -133,7 +134,7 @@ const LevelWorld = ({
                                 style={{
                                     left: `${i.x}%`,
                                     bottom: `${renderY + 2}%`,
-                                    backgroundImage: `url('/coin/coin${coinFrame}.png')`,
+                                    backgroundImage: `url('${getCachedImage(`/coin/coin${coinFrame}.png`)}')`,
                                 }}
                             >
                                 <div className="coin-glow"></div>
@@ -193,7 +194,8 @@ const LevelWorld = ({
                     const raiderType = e.type;
 
                     let spriteName = e.state;
-                    let frameNum = e.frame;
+                    if (!spriteName || spriteName === 'undefined') spriteName = 'idle';
+                    let frameNum = e.frame || 0;
 
                     if (raiderType === 'raider1') {
                         if (['shoot', 'recharge', 'jump'].includes(e.state)) {
@@ -230,10 +232,10 @@ const LevelWorld = ({
                             )}
                             <img
                                 className={`enemy-sprite ${(e.state === 'hurt' || (e.hurtFlashTicks > 0)) ? 'damage-flicker' : ''}`}
-                                src={e.type.startsWith('z')
+                                src={getCachedImage(e.type.startsWith('z')
                                     ? `/zombies/${e.type}/${e.type}_${spriteName}_${frameNum}.png`
                                     : `/${raiderType}/raider_${spriteName}${frameNum}.png`
-                                }
+                                )}
                                 alt="enemy"
                             />
                             {e.hasDroppedAmmo && (
@@ -281,13 +283,13 @@ const LevelWorld = ({
                     >
                         {p.type === 'grenade_explosion' ? (
                             <img
-                                src={`/explosions/explosion${Math.max(1, Math.min(14, Math.floor((p.maxLife || 14) - p.life) + 1))}.png`}
+                                src={getCachedImage(`/explosions/explosion${Math.max(1, Math.min(14, Math.floor((p.maxLife || 14) - p.life) + 1))}.png`)}
                                 alt="explosion"
                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
                         ) : p.type === 'grenade_smoke' ? (
                             <img
-                                src={`/soldier/grenade_smoke${String(Math.floor(22 - p.life)).padStart(2, '0')}.png`}
+                                src={getCachedImage(`/soldier/grenade_smoke${String(Math.floor(22 - p.life)).padStart(2, '0')}.png`)}
                                 alt="smoke"
                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
@@ -310,7 +312,7 @@ const LevelWorld = ({
                             />
                         ) : p.type === 'punch' ? (
                             <img
-                                src={`/punches/p${Math.max(1, Math.min(5, Math.floor(((p.maxLife || 10) - p.life) / 2) + 1))}.png`}
+                                src={getCachedImage(`/punches/p${Math.max(1, Math.min(5, Math.floor(((p.maxLife || 10) - p.life) / 2) + 1))}.png`)}
                                 alt="punch"
                                 style={{
                                     width: '12rem',
@@ -335,9 +337,9 @@ const LevelWorld = ({
                     </div>
                 ))}
 
-                {levelData.hazards.map(h => (
+                {levelData.hazards.map((h, index) => (
                     <div
-                        key={h.id}
+                        key={`hazard-${index}`}
                         className={`hazard ${h.type}`}
                         style={{
                             left: `${h.x}%`,
@@ -365,12 +367,12 @@ const LevelWorld = ({
                     className="player-character"
                     style={{
                         left: `${playerPos.x}%`,
-                        bottom: `${playerPos.y}%`,
+                        bottom: `calc(${playerPos.y}% + 13px)`,
                         transform: `translateX(-50%) scaleX(${playerFacing})`,
                     }}
                 >
                     <img
-                        src={`/soldier/soldier_${getSoldierSpriteKey(playerState)}${(playerState === 'hurt' && playerFrame > 3) ? 0 : playerFrame}.png`}
+                        src={getCachedImage(`/soldier/soldier_${getSoldierSpriteKey(playerState)}${(playerState === 'hurt' && playerFrame > 3) ? 0 : playerFrame}.png`)}
                         alt="soldier"
                         className={`player-sprite ${isHurtFlash ? 'damage-flicker' : (hp < 30 ? 'hp-critical-flicker' : '')}`}
                         style={{ opacity: playerState === 'dead' && playerFrame === 4 ? 0.8 : 1 }}

@@ -1,48 +1,49 @@
 import { ENEMY_STATS, PROJECTILE_STATS, HAZARD_STATS } from '../../constants';
 
 export const levelTwentyObjectives = [
-    { id: 1, text: 'SECURE THE SIGNAL TRACKER', status: 'active' },
-    { id: 2, text: 'NEUTRALIZE COMMANDER THREAT', status: 'pending' }
+    { id: 1, text: 'NEUTRALIZE ALL THREATS', target: 20, current: 0, status: 'active' }
 ];
 
 export const getLevelTwentyEnemies = (difficultyMod) => [
-    { id: 'z1_1', type: 'z3', x: 70, y: 0, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'z1_1', type: 'z3', x: 70, y: 0, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
-    { id: 'z1_2', type: 'z1', x: 80, y: 0, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'z1_2', type: 'z1', x: 80, y: 0, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
-    { id: 'z1_3', type: 'z3', x: 90, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
-    { id: 'e1', type: 'raider2', x: 110, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_3', type: 'z3', x: 90, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'e1', type: 'raider2', x: 110, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
 
-    { id: 'e2', type: 'raider2', x: 210, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e3', type: 'raider2', x: 250, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'z1_4', type: 'z4', x: 280, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'e2', type: 'raider2', x: 210, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e3', type: 'raider2', x: 250, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_4', type: 'z4', x: 280, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
-    { id: 'e4', type: 'raider2', x: 310, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e5', type: 'raider2', x: 350, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'z1_5', type: 'z2', x: 380, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
-    { id: 'z1_6', type: 'z2', x: 400, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'e4', type: 'raider2', x: 310, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e5', type: 'raider2', x: 350, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_5', type: 'z2', x: 380, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'z1_6', type: 'z2', x: 400, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
-    { id: 'e11', type: 'raider1', x: 460, y: 10, hp: ENEMY_STATS.RAIDER1_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e14', type: 'raider2', x: 470, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'z1_7', type: 'z1', x: 480, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
-    { id: 'z1_8', type: 'z1', x: 490, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'e11', type: 'raider1', x: 460, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e14', type: 'raider2', x: 470, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_7', type: 'z1', x: 480, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'z1_8', type: 'z1', x: 490, y: 10, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
 
-    { id: 'e16', type: 'raider2', x: 600, y: 22, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e17', type: 'raider1', x: 620, y: 0, hp: ENEMY_STATS.RAIDER1_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e18', type: 'raider1', x: 640, y: 0, hp: ENEMY_STATS.RAIDER1_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'z1_9', type: 'z3', x: 650, y: 0, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
-    { id: 'z1_10', type: 'z2', x: 740, y: 30, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'e16', type: 'raider2', x: 580, y: 22, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e17', type: 'raider1', x: 610, y: 0, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
 
-    { id: 'e19', type: 'raider2', x: 740, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e20', type: 'raider2', x: 760, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e21', type: 'raider2', x: 780, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e18', type: 'raider1', x: 620, y: 0, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_9', type: 'z3', x: 630, y: 0, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
-    { id: 'e22', type: 'raider2', x: 800, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e23', type: 'raider2', x: 860, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e24', type: 'raider2', x: 880, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e25', type: 'raider2', x: 910, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e26', type: 'raider2', x: 940, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_10', type: 'z2', x: 640, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+
+    { id: 'e19', type: 'raider2', x: 760, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e20', type: 'raider2', x: 770, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e21', type: 'raider2', x: 780, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+
+    { id: 'e22', type: 'raider2', x: 800, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e23', type: 'raider2', x: 860, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e24', type: 'raider2', x: 880, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e25', type: 'raider2', x: 910, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e26', type: 'raider2', x: 940, y: 30, hp: 300, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
 
 
 ];
@@ -51,25 +52,23 @@ export const levelTwentyLayout = {
     platforms: [
 
         //Ground support ramp 1
-        { id: 'g15', type: 'floor', x: 84, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 94, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 104, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 114, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 124, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 84, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 94, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 104, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 114, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 124, y: -5, w: 400, h: 80, },
 
 
         //Base Ground formation 1
-        { id: 'g1', type: 'floor', x: -2, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: -10, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 0, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 12, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 22, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 32, y: -5, w: 400, h: 80, },
 
         //Air Formation 1
 
-        { id: 'g8', type: 'floor', x: 52, y: 35, w: 400, h: 80, },
-        { id: 'g8', type: 'floor', x: 72, y: 55, w: 400, h: 80, },
-        { id: 'g8', type: 'floor', x: 92, y: 35, w: 400, h: 80, },
-        { id: 'g8', type: 'floor', x: 152, y: 35, w: 400, h: 80, },
+
         { id: 'g10', type: 'floor', x: 948, y: 13, w: 400, h: 80, },
 
         //Ground formation 1
@@ -80,14 +79,15 @@ export const levelTwentyLayout = {
         { id: 'g1', type: 'floor', x: 72.8, y: -5, w: 400, h: 80, },
 
 
-        // Ramp formation 1
-        { id: 'g2', type: 'floor', x: 84, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 91, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 98, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 105, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 112, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 119, y: 5, w: 400, h: 80, },
-        { id: 'g3', type: 'floor', x: 130, y: 5, w: 400, h: 80, },
+
+
+
+
+
+
+
+
+
 
 
         //Base Ground support ramp 2
@@ -270,10 +270,21 @@ export const levelTwentyLayout = {
         { id: 'g1', type: 'floor', x: 630, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 640, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 650, y: -5, w: 400, h: 80, },
-        { id: 'g3', type: 'floor', x: 660, y: -5, w: 400, h: 80, },
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+        //f1
         //Air Platforms Section 5
         { id: 'g1', type: 'floor', x: 660, y: 15, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 670, y: 15, w: 400, h: 80, },
@@ -391,8 +402,16 @@ export const levelTwentyLayout = {
 
 
 
+
+
+
+
+
+
+
         //Ground sector 5
         { id: 'g3', type: 'floor', x: 813, y: 31.2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 818, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 821, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 831, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 841, y: 21, w: 400, h: 80, },
@@ -440,7 +459,7 @@ export const levelTwentyLayout = {
     checkpoints: [
         // Flags
         { id: 'cp1', x: 30, y: 6, },
-        { id: 'cp2', x: 110, y: 16, },
+        { id: 'cp2', x: 110, y: 6, },
         { id: 'cp3', x: 320, y: 15, },
         { id: 'cp4', x: 490, y: 6, },
         { id: 'cp5', x: 800, y: 43, },
@@ -448,20 +467,16 @@ export const levelTwentyLayout = {
 
     ],
     interactables: [
-        { id: 'exit1', type: 'extraction', x: 1220, y: 0, label: 'EXTRACTION_ZTwenty' },
+        { id: 'exit1', type: 'extraction', x: 1220, y: 0 },
 
-        { id: 'key1', type: 'tracker', x: 534.0, y: 27.5, },
 
         // Air Coins Set 1
 
-        { id: 'c1', type: 'coin', x: 61, y: 48, },
-        { id: 'c2', type: 'coin', x: 81, y: 68, },
-        { id: 'c3', type: 'coin', x: 101, y: 48, },
-        { id: 'c26', type: 'coin', x: 160, y: 48, },
+
 
         // Ground Coins Set 1
-        { id: 'c4', type: 'coin', x: 100, y: 20, },
-        { id: 'c5', type: 'coin', x: 128, y: 20, },
+        { id: 'c4', type: 'coin', x: 100, y: 8, },
+        { id: 'c5', type: 'coin', x: 128, y: 8, },
         { id: 'c6', type: 'coin', x: 240, y: 28, },
         { id: 'c7', type: 'coin', x: 270, y: 28, },
         { id: 'c8', type: 'coin', x: 300, y: 17, },

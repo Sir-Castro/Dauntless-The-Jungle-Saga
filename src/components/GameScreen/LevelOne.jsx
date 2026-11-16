@@ -1,13 +1,13 @@
 import { ENEMY_STATS, PROJECTILE_STATS, HAZARD_STATS } from '../../constants';
 
 export const levelOneObjectives = [
-    { id: 1, text: 'SECURE 20 TACTICAL DATA COINS', status: 'active', current: 0, target: 20 },
-    { id: 2, text: 'NEUTRALIZE ALL RAIDER SQUADS', status: 'active' }
+    { id: 1, text: 'COLLECT 20 COINS', status: 'active', current: 0, target: 20 },
+    { id: 2, text: 'NEUTRALIZE ALL RAIDERS', status: 'active', current: 0, target: 14 }
 ];
 
 export const getLevelOneEnemies = (difficultyMod) => [
     { id: 'e1', type: 'raider1', x: 60, y: 0, hp: ENEMY_STATS.RAIDER1_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e2', type: 'raider2', x: 260, y: 15, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e2', type: 'raider2', x: 300, y: 15, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'e3', type: 'raider2', x: 350, y: 0, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: [58, 105], detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'e4', type: 'raider2', x: 400, y: 0, hp: ENEMY_STATS.RAIDER2_HP, frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'e5', type: 'raider2', x: 480, y: 0, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: [250, 280], detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
@@ -39,7 +39,8 @@ export const levelOneLayout = {
 
 
         //Base Ground formation 1
-        { id: 'g1', type: 'floor', x: -2, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: -10, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 0, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 12, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 22, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 32, y: -5, w: 400, h: 80, },
@@ -61,13 +62,13 @@ export const levelOneLayout = {
 
 
         // Ramp formation 1
-        { id: 'g2', type: 'floor', x: 84, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 91, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 98, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 105, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 112, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 119, y: 5, w: 400, h: 80, },
-        { id: 'g3', type: 'floor', x: 130, y: 5, w: 400, h: 80, },
+        { id: 'g2', type: 'floor', x: 86, y: 5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 91, y: 2.3, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 98, y: 2.3, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 105, y: 2.3, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 112, y: 2.3, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 119, y: 2.3, w: 400, h: 80, },
+        { id: 'g3', type: 'floor', x: 132, y: 2, w: 400, h: 80, },
 
 
         //Base Ground support ramp 2
@@ -77,9 +78,9 @@ export const levelOneLayout = {
         { id: 'g15', type: 'floor', x: 206, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 216, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 226, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 236, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 246, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 256, y: -5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 230, y: -5, w: 400, h: 80, },
+
+        { id: 'g15', type: 'floor', x: 260, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 266, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 276, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 286, y: -5, w: 400, h: 80, },
@@ -94,60 +95,51 @@ export const levelOneLayout = {
         { id: 'g15', type: 'floor', x: 376, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 386, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 396, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 406, y: -5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 403, y: -5, w: 400, h: 80, },
 
         //Secondary Base Ground Support 2
-        { id: 'g15', type: 'floor', x: 220, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 230, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 240, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 250, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 260, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 270, y: 5, w: 400, h: 80, },
+
+
+
+
 
 
         // Ground formation 2
         { id: 'g1', type: 'floor', x: 137, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 150, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 163, y: -5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 176, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 172, y: -5, w: 400, h: 80, },
 
         // Ramp formation 2
-        { id: 'g2', type: 'floor', x: 190, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 191, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 200, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 210, y: 5, w: 400, h: 80, },
+        { id: 'g2', type: 'floor', x: 185, y: 5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 191, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 200, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 210, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 220, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 230, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 260, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 270, y: 2, w: 400, h: 80, },
 
 
-        //Secondary ramp formation 2
-        { id: 'g4', type: 'floor', x: 223, y: 13, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 225, y: 13, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 235, y: 13, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 245, y: 13, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 255, y: 13, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 265, y: 13, w: 400, h: 80, },
-        { id: 'g5', type: 'floor', x: 277, y: 13, w: 400, h: 80, },
 
         //Scondary Ground formation 3
-        { id: 'g1', type: 'floor', x: 283, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 293, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 303, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 313, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 323, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 333, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 343, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 353, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 363, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 373, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 383, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 393, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 403, y: 5, w: 400, h: 80, },
-        { id: 'g3', type: 'floor', x: 414, y: 5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 283, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 293, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 303, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 313, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 323, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 333, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 343, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 353, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 363, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 373, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 383, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 393, y: 2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 403, y: 2, w: 400, h: 80, },
 
-        //Ground formation 3
-        //Remember to include real assets like plane and buildings
-        { id: 'g1', type: 'floor', x: 419, y: -5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 429, y: -5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 439, y: -5, w: 400, h: 80, },
+
+
+
         { id: 'g1', type: 'floor', x: 449, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 459, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 469, y: -5, w: 400, h: 80, },
@@ -204,40 +196,6 @@ export const levelOneLayout = {
         { id: 'g15', type: 'floor', x: 751, y: 15, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 751, y: 25, w: 400, h: 80, },
 
-
-
-        { id: 'g15', type: 'floor', x: 764, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 764, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 764, y: 15, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 764, y: 25, w: 400, h: 80, },
-
-
-
-        { id: 'g15', type: 'floor', x: 777, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 777, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 777, y: 15, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 777, y: 25, w: 400, h: 80, },
-
-
-
-        { id: 'g15', type: 'floor', x: 790, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 790, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 790, y: 15, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 790, y: 25, w: 400, h: 80, },
-
-
-
-        { id: 'g15', type: 'floor', x: 803, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 803, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 803, y: 15, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 803, y: 25, w: 400, h: 80, },
-
-
-
-
-
-
-
         //Ground formation 4
         { id: 'g1', type: 'floor', x: 550, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 560, y: -5, w: 400, h: 80, },
@@ -250,9 +208,6 @@ export const levelOneLayout = {
         { id: 'g1', type: 'floor', x: 630, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 640, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 650, y: -5, w: 400, h: 80, },
-        { id: 'g3', type: 'floor', x: 660, y: -5, w: 400, h: 80, },
-
-
 
         //Air Platforms Section 5
         { id: 'g1', type: 'floor', x: 660, y: 15, w: 400, h: 80, },
@@ -266,28 +221,12 @@ export const levelOneLayout = {
         { id: 'g1', type: 'floor', x: 730, y: 31.2, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 740, y: 31.2, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 750, y: 31.2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 760, y: 31.2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 770, y: 31.2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 780, y: 31.2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 790, y: 31.2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 800, y: 31.2, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 751, y: 31.2, w: 400, h: 80, },
 
 
+        { id: 'g8', type: 'floor', x: 800, y: 31.2, w: 400, h: 80, },
         //Ground Support Sector 5
-        { id: 'g15', type: 'floor', x: 816, y: 21, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 816, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 816, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 816, y: 15, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 829, y: 21, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 829, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 829, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 829, y: 15, w: 400, h: 80, },
-
-        { id: 'g15', type: 'floor', x: 832, y: 21, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 832, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 832, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 832, y: 15, w: 400, h: 80, },
 
 
         { id: 'g15', type: 'floor', x: 844, y: -5, w: 400, h: 80, },
@@ -372,10 +311,8 @@ export const levelOneLayout = {
 
 
         //Ground sector 5
-        { id: 'g3', type: 'floor', x: 813, y: 31.2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 821, y: 21, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 831, y: 21, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 841, y: 21, w: 400, h: 80, },
+
+        { id: 'g1', type: 'floor', x: 843, y: 21, w: 400, h: 80, },
         { id: 'g5', type: 'floor', x: 852, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 858, y: 13, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 868, y: 13, w: 400, h: 80, },
@@ -421,10 +358,10 @@ export const levelOneLayout = {
     checkpoints: [
         // Flags
         { id: 'cp1', x: 30, y: 6, },
-        { id: 'cp2', x: 110, y: 16, },
+        { id: 'cp2', x: 110, y: 13, },
         { id: 'cp3', x: 320, y: 15, },
         { id: 'cp4', x: 490, y: 6, },
-        { id: 'cp5', x: 800, y: 43, },
+        { id: 'cp5', x: 750, y: 43, },
         { id: 'cp6', x: 1040, y: 24, },
 
     ],
@@ -440,9 +377,9 @@ export const levelOneLayout = {
 
         // Ground Coins Set 1
         { id: 'c4', type: 'coin', x: 100, y: 20, },
-        { id: 'c5', type: 'coin', x: 128, y: 20, },
-        { id: 'c6', type: 'coin', x: 240, y: 28, },
-        { id: 'c7', type: 'coin', x: 270, y: 28, },
+        { id: 'c5', type: 'coin', x: 180, y: 20, },
+        { id: 'c6', type: 'coin', x: 240, y: 17, },
+        { id: 'c7', type: 'coin', x: 290, y: 17, },
         { id: 'c8', type: 'coin', x: 300, y: 17, },
         { id: 'c9', type: 'coin', x: 350, y: 17, },
         { id: 'c10', type: 'coin', x: 400, y: 17, },
@@ -454,10 +391,11 @@ export const levelOneLayout = {
         { id: 'c16', type: 'coin', x: 650, y: 10, },
         { id: 'c17', type: 'coin', x: 700, y: 36, },
         { id: 'c18', type: 'coin', x: 750, y: 44, },
-        { id: 'c19', type: 'coin', x: 800, y: 44, },
-        { id: 'c20', type: 'coin', x: 810, y: 44, },
-        { id: 'c21', type: 'coin', x: 850, y: 34, },
-        { id: 'c22', type: 'coin', x: 880, y: 26, },
+
+        { id: 'c19', type: 'coin', x: 850, y: 34, },
+        { id: 'c20', type: 'coin', x: 870, y: 26, },
+        { id: 'c21', type: 'coin', x: 880, y: 26, },
+        { id: 'c22', type: 'coin', x: 890, y: 26, },
         { id: 'c23', type: 'coin', x: 910, y: 26, },
         { id: 'c27', type: 'coin', x: 955, y: 26, },
         { id: 'c24', type: 'coin', x: 990, y: 26, },

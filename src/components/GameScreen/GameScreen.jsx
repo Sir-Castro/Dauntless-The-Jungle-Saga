@@ -8,27 +8,31 @@ import RespawnOverlay from './RespawnOverlay';
 import LevelCompleteModal from './LevelCompleteModal';
 import OrientationWarning from './OrientationWarning';
 import PauseMenu from './PauseMenu';
+import ShopModal from './ShopModal';
 import { getMissionData } from './LevelData';
 import { updateEnemyForTick } from './enemyAI';
 import useMobileDetection from './useMobileDetection';
 import useInputHandlers from './useInputHandlers';
 import useGameLoop from './useGameLoop';
+import { startBackgroundMusic, stopBackgroundMusic, stopAllLoopSounds } from '../../utils/sounds';
 import { ENEMY_STATS, PLAYER_STATS, PROJECTILE_STATS } from '../../constants';
 
-const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete }) => {
+const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete, isLevelLoading, onReady, totalCoins, setTotalCoins }) => {
     const [hp, setHp] = useState(100);
     const [rad, setRad] = useState(12);
     const [ammo, setAmmo] = useState(24);
     const [magSize] = useState(16);
     const [currentMag, setCurrentMag] = useState(16);
-    const startingGrenades = levelId === 1 ? 0 : (levelId === 7 ? 6 : PLAYER_STATS.STARTING_GRENADES);
+    const startingGrenades = [3, 4, 7, 14, 18].includes(levelId) ? 5 : 2;
     const [grenades, setGrenades] = useState(startingGrenades);
-    const startingShields = levelId === 1 ? 0 : (levelId === 8 ? 7 : PLAYER_STATS.STARTING_SHIELDS);
+    const startingShields = 2;
     const [shields, setShields] = useState(startingShields);
     const [isShieldOnCooldown, setIsShieldOnCooldown] = useState(false);
 
     const [playerPos, setPlayerPos] = useState({ x: 5, y: 20 });
     const [isGameOver, setIsGameOver] = useState(false);
+
+
     const [playerState, setPlayerState] = useState('idle');
     const [playerFrame, setPlayerFrame] = useState(0);
     const [playerFacing, setPlayerFacing] = useState(1); // 1: right, -1: left
@@ -48,19 +52,22 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
     const [respawnTimer, setRespawnTimer] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [isDebriefOpen, setIsDebriefOpen] = useState(false);
-    const [medkits, setMedkits] = useState(2);
-    const medkitsRef = React.useRef(2);
+    // Shop Modal State
+    const [isShopOpen, setIsShopOpen] = useState(false);
+    const [shopItemType, setShopItemType] = useState(null);
+    const [shopPurchaseAmount, setShopPurchaseAmount] = useState(1);
+
+    const startingMedkits = 2;
+    const [medkits, setMedkits] = useState(startingMedkits);
+    const medkitsRef = React.useRef(startingMedkits);
     const [score, setScore] = useState(0);
     const scoreRef = React.useRef(0);
-    const initialTime = levelId === 4 ? 120 : (levelId === 7 ? 120 : (levelId === 9 ? 90 : 180));
+    const initialTime = levelId === 4 ? 120 : (levelId === 7 ? 180 : (levelId === 9 ? 90 : (levelId === 16 ? 120 : (levelId === 17 ? 120 : 180))));
     const [levelTime, setLevelTime] = useState(initialTime);
     const levelTimeRef = React.useRef(initialTime);
     const [isTimerActive, setIsTimerActive] = useState(false);
 
     const cameraXRef = React.useRef(0);
-    useEffect(() => {
-        cameraXRef.current = cameraX;
-    }, [cameraX]);
 
 
 
@@ -71,13 +78,6 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
     const [enemies, setEnemies] = useState(missionData.enemies);
     const [levelData, setLevelData] = useState(missionData.levelData);
     const [isLevelComplete, setIsLevelComplete] = useState(false);
-
-    // Register level progression exactly once when completion flag is crossed
-    useEffect(() => {
-        if (isLevelComplete && onLevelComplete) {
-            onLevelComplete(levelId);
-        }
-    }, [isLevelComplete, levelId, onLevelComplete]);
     const [keyFrame, setKeyFrame] = useState(0);
     const [coinFrame, setCoinFrame] = useState(0);
     const [collectedKeys, setCollectedKeys] = useState([]);
@@ -90,18 +90,61 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
     const collectedKitsRef = React.useRef([]);
     const collectedAmmoRef = React.useRef([]);
 
+    const handleItemEmpty = React.useCallback((itemType) => {
+        if (!isShopOpen && !isGameOver && !isLevelComplete && !isPauseOpen) {
+            setShopItemType(itemType);
+            setShopPurchaseAmount(1);
+            setIsShopOpen(true);
+        }
+    }, [isShopOpen, isGameOver, isLevelComplete, isPauseOpen]);
+
+    const handleBuyItem = (cost, amount) => {
+        if (totalCoins >= cost) {
+            setTotalCoins(prev => prev - cost);
+            if (shopItemType === 'grenade') {
+                const newVal = grenadesRef.current + amount;
+                setGrenades(newVal);
+                grenadesRef.current = newVal;
+            } else if (shopItemType === 'shield') {
+                const newVal = shieldsRef.current + amount;
+                setShields(newVal);
+                shieldsRef.current = newVal;
+            } else if (shopItemType === 'medkit') {
+                const newVal = medkitsRef.current + amount;
+                setMedkits(newVal);
+                medkitsRef.current = newVal;
+            }
+            setIsShopOpen(false);
+        }
+    };
+
     useEffect(() => { collectedKeysRef.current = collectedKeys; }, [collectedKeys]);
     useEffect(() => { collectedCoinsRef.current = collectedCoins; }, [collectedCoins]);
     useEffect(() => { collectedKitsRef.current = collectedKits; }, [collectedKits]);
     useEffect(() => { collectedAmmoRef.current = collectedAmmo; }, [collectedAmmo]);
+
+    const hasCompletedRef = React.useRef(false);
+    useEffect(() => {
+        if (isLevelComplete && onLevelComplete && !hasCompletedRef.current) {
+            hasCompletedRef.current = true;
+            onLevelComplete(levelId, score + (collectedCoins.length * 10));
+        }
+    }, [isLevelComplete, levelId, onLevelComplete, score, collectedCoins.length]);
 
     useEffect(() => {
         // Sequenced Entry: Assets ready instantly, Background follows
         setIsLoaded(true);
         const timer = setTimeout(() => {
             setBackgroundReady(true);
+            startBackgroundMusic(levelId);
+            if (onReady) onReady();
         }, 500);
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            stopBackgroundMusic();
+            stopAllLoopSounds();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [levelId]);
 
     // Dynamic Level Re-Initialization
@@ -173,7 +216,10 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                 waitTicks: 0,
                 ammo: e.type.startsWith('z') ? 0 : (e.type === 'raider2' ? ENEMY_STATS.RAIDER2_MAG_SIZE : ENEMY_STATS.RAIDER1_MAG_SIZE),
                 hp: startHp,
-                maxHp: startHp
+                maxHp: startHp,
+                state: e.state || 'idle',
+                frame: e.frame || 0,
+                facing: e.facing || -1
             };
         });
 
@@ -201,6 +247,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         setActiveCheckpointId('cp0'); // Force-activate deployment flag
         setLivesAtCheckpoint(0);
         setCameraX(0);
+        cameraXRef.current = 0;
         setHp(100);
         hpRef.current = 100;
         setAmmo(24);
@@ -211,18 +258,31 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         grenadesRef.current = startingGrenades;
         setShields(startingShields);
         shieldsRef.current = startingShields;
+        setMedkits(startingMedkits);
+        medkitsRef.current = startingMedkits;
         setIsShieldOnCooldown(false);
         isShieldOnCooldownRef.current = false;
         setCollectedKeys([]);
+        collectedKeysRef.current = [];
         setCollectedCoins([]);
+        collectedCoinsRef.current = [];
         setCollectedKits([]);
         setCollectedAmmo([]);
+        setScore(0);
+        scoreRef.current = 0;
         setIsGameOver(false);
         setIsLevelComplete(false);
+        setIsPauseOpen(false);
+        setIsShopOpen(false);
         levelStartTime.current = performance.now();
+
+        const startTime = levelId === 4 ? 120 : (levelId === 7 ? 180 : (levelId === 9 ? 90 : (levelId === 16 ? 120 : (levelId === 17 ? 120 : 180))));
+        setLevelTime(startTime);
+        if (levelTimeRef) levelTimeRef.current = startTime;
 
         // Kinetic Neutralization: Purge residual momentum from previous sector
         velRef.current = { x: 0, y: 0 };
+        keysRef.current = {}; // Flush all lingering inputs from transitions (touch/keyboard)
         isGroundedRef.current = true;
         setIsGrounded(true);
         setPlayerState('idle');
@@ -233,15 +293,17 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
             hp: 100,
             ammo: 24,
             mag: 8,
-            score: 0,
-            grenades: startingGrenades,
-            shields: startingShields,
+            score: scoreRef.current,
+            grenades: grenadesRef.current,
+            shields: shieldsRef.current,
             collectedKeys: [],
             collectedCoins: [],
             collectedKits: [],
+            collectedAmmo: [],
             enemies: groundedEnemies,
             objectives: (missionData.objectives || []).map(o => ({ ...o })),
-            medkits: 2
+            medkits: startingMedkits,
+            shieldedZombies: Array.from(shieldedZombiesRef.current)
         };
         initialCheckpointRegistry.current = { ...checkpointRegistry.current };
     }, [missionData]);
@@ -272,6 +334,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
     const initialCheckpointRegistry = React.useRef(null);
     const initialCheckpointPos = React.useRef({ x: 8, y: 11.6 });
     const shieldTimeRef = React.useRef(0);
+    const shieldedZombiesRef = React.useRef(new Set());
     const playerStateRef = React.useRef('idle');
     const playerFacingRef = React.useRef(1);
     const isShieldActiveRef = React.useRef(false);
@@ -339,6 +402,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         posRef.current = { ...currentCPPos };
         setPlayerPos({ ...currentCPPos });
         setCameraX(Math.max(0, currentCPPos.x - 50));
+        cameraXRef.current = Math.max(0, currentCPPos.x - 50);
 
         // Restore Mission Progress Registry
         const respawnHp = saved.hp || 100;
@@ -353,14 +417,16 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         setCurrentMag(respawnMag);
         magRef.current = respawnMag;
 
-        if (forceFullReset) {
+        const isFullReset = forceFullReset || nextLives >= 3;
+
+        if (isFullReset) {
             setGrenades(startingGrenades);
             grenadesRef.current = startingGrenades;
             setShields(startingShields);
             shieldsRef.current = startingShields;
-            setMedkits(2);
-            medkitsRef.current = 2;
-            const startTime = levelId === 4 ? 120 : (levelId === 7 ? 120 : (levelId === 9 ? 90 : 180));
+            setMedkits(startingMedkits);
+            medkitsRef.current = startingMedkits;
+            const startTime = levelId === 4 ? 120 : (levelId === 7 ? 180 : (levelId === 9 ? 90 : (levelId === 16 ? 120 : (levelId === 17 ? 120 : 180))));
             setLevelTime(startTime);
             levelTimeRef.current = startTime;
         }
@@ -368,15 +434,30 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         setIsShieldOnCooldown(false);
         isShieldOnCooldownRef.current = false;
 
-        const isFullReset = forceFullReset || nextLives >= 3;
+        // Reset any active shield on restart
+        setIsShieldActive(false);
+        if (isShieldActiveRef) isShieldActiveRef.current = false;
+        setShieldTime(0);
+        if (shieldTimeRef) shieldTimeRef.current = 0;
 
         // Strict Checkpoint Reversion: Restore all progress markers to the saved snapshot
-        setCollectedKeys(saved.collectedKeys || []);
-        setCollectedCoins(saved.collectedCoins || []);
-        setCollectedAmmo(saved.collectedAmmo || []); // Revert ammo pickups to checkpoint state
+        const restoredKeys = [...(saved.collectedKeys || [])];
+        const restoredCoins = [...(saved.collectedCoins || [])];
+        setCollectedKeys(restoredKeys);
+        collectedKeysRef.current = restoredKeys;
+        setCollectedCoins(restoredCoins);
+        collectedCoinsRef.current = restoredCoins;
+        setCollectedAmmo([...(saved.collectedAmmo || [])]); // Revert ammo pickups to checkpoint state
+        setCollectedKits([...(saved.collectedKits || [])]);
 
         if (saved.objectives) {
             setObjectives(saved.objectives.map(o => ({ ...o })));
+        }
+
+        if (saved.shieldedZombies) {
+            shieldedZombiesRef.current = new Set(saved.shieldedZombies);
+        } else {
+            shieldedZombiesRef.current.clear();
         }
 
         const respawnScore = saved.score || 0;
@@ -388,6 +469,9 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         setPlayerFrame(0);
         setRespawnTimer(0);
         setIsGameOver(false);
+        setIsLevelComplete(false);
+        setIsPauseOpen(false);
+        setIsShopOpen(false);
         keysRef.current = {}; // Flush tactical input buffer to prevent state sticking
 
         // Reset destructible hazards
@@ -396,6 +480,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                 if (h.type === 'turret_top') {
                     h.hp = 10;
                     h.hurtFlash = 0;
+                    h.objectiveCounted = false;
                 }
             });
         }
@@ -451,13 +536,11 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         isGroundedRef.current = true;
         projectilesRef.current = [];
         setProjectiles([]);
-        setIsGameOver(false);
-        setIsLevelComplete(false);
     }, [livesAtCheckpoint, checkpointRegistry, checkpointPos, initialCheckpointRegistry, initialCheckpointPos, levelId, difficulty, hpRef, ammoRef, magRef, posRef, velRef, projectilesRef]);
 
     // Respawn Countdown Logic
     useEffect(() => {
-        if (levelId === 3 && hp <= 0 && !isGameOver) {
+        if ((levelId === 3 || levelId === 19) && hp <= 0 && !isGameOver) {
             const timer = setTimeout(() => {
                 setIsGameOver(true);
             }, 800); // Brief pause to see the death animation
@@ -472,7 +555,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                 setRespawnTimer(prev => {
                     if (prev <= 1) {
                         clearInterval(timer);
-                        handleRestart(levelId === 3);
+                        handleRestart(levelId === 3 || levelId === 19);
                         return 0;
                     }
                     return prev - 1;
@@ -527,6 +610,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         magRef,
         ammoRef,
         lastFireTimeRef,
+        shieldedZombiesRef,
         setCurrentMag,
         setPlayerFrame,
         setPlayerState,
@@ -571,7 +655,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         updateEnemyForTick,
         hurtTimerRef,
         setIsHurtFlash,
-        isPauseOpen,
+        isPauseOpen: isPauseOpen || isLevelLoading || isShopOpen,
         cameraAnchorRef,
         grenades,
         setGrenades,
@@ -596,7 +680,8 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
         setLevelTime,
         levelTimeRef,
         setIsTimerActive,
-        isTimerActive
+        isTimerActive,
+        onItemEmpty: handleItemEmpty
     });
     return (
         <div className={`game-screen-container ${isLoaded ? 'fade-in' : ''} ${backgroundReady ? 'bg-ready' : ''} ${isMobile ? 'mobile-interface' : ''}`}>
@@ -613,6 +698,8 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                 shields={shields}
                 isShieldOnCooldown={isShieldOnCooldown}
                 isShieldActive={isShieldActive}
+                grenades={grenades}
+                onItemEmpty={handleItemEmpty}
             />
 
             <LevelWorld
@@ -661,7 +748,7 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                 isGameOver={isGameOver}
                 levelId={levelId}
                 levelTitle={levelTitle}
-                onRestart={() => handleRestart(levelId === 3 || levelId === 7 || levelId === 9)}
+                onRestart={() => handleRestart([2, 3, 4, 5, 7, 9, 16, 17, 19].includes(levelId))}
                 onExit={onExit}
             />
 
@@ -671,12 +758,13 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                 isLevelComplete={isLevelComplete}
                 levelId={levelId}
                 collectedCoins={collectedCoins}
+                score={score + (collectedCoins.length * 10)}
                 onExit={onExit}
                 onProceed={onProceed}
             />
 
             <PauseMenu
-                isOpen={isPauseOpen && !isGameOver && !isLevelComplete}
+                isOpen={isPauseOpen && !isGameOver && !isLevelComplete && !isShopOpen}
                 onRestart={() => {
                     setIsPauseOpen(false);
                     handleRestart(true);
@@ -686,6 +774,16 @@ const GameScreen = ({ levelId, levelTitle, onExit, onProceed, onLevelComplete })
                     setIsPauseOpen(false);
                     onExit();
                 }}
+            />
+
+            <ShopModal
+                isOpen={isShopOpen}
+                itemType={shopItemType}
+                amount={shopPurchaseAmount}
+                setAmount={setShopPurchaseAmount}
+                totalCoins={totalCoins}
+                onBuy={handleBuyItem}
+                onCancel={() => setIsShopOpen(false)}
             />
 
             <OrientationWarning />

@@ -40,6 +40,107 @@
     z-index: 5;
 }
 
+.dev-warning {
+    color: var(--accent-primary);
+    text-shadow: 0 0 10px rgba(0, 255, 163, 0.5);
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.main-menu-coin-counter {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--accent-primary);
+    padding: 5px 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 255, 163, 0.2);
+    z-index: 1000;
+}
+
+.main-menu-ad-banner {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #ff8c00;
+    padding: 8px 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.2);
+    z-index: 1000;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: ad-pulse-wait 2.5s infinite ease-in-out;
+}
+
+.main-menu-ad-banner:hover {
+    background: rgba(255, 140, 0, 0.2);
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
+    transform: scale(1.05);
+    animation: none;
+}
+
+@keyframes ad-pulse-wait {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 140, 0, 0.2); }
+    10% { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 140, 0, 0.7); }
+    20% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 140, 0, 0.2); }
+    100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 140, 0, 0.2); }
+}
+
+.main-menu-ad-header {
+    display: flex;
+    align-items: center;
+}
+
+.main-menu-ad-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    object-fit: contain;
+    color: #ff8c00;
+}
+
+.spinning-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+.main-menu-ad-title {
+    color: #ff8c00;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+}
+
+.main-menu-ad-desc {
+    color: #ffd700;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.main-menu-coin-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.main-menu-coin-text {
+    color: var(--accent-primary);
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+}
 
 .logo-ring {
     position: absolute;
@@ -211,7 +312,7 @@
     }
 
     .main-logo-container {
-        width: 100vw;
+        width: 100%;
         height: 35vh;
     }
 
@@ -231,4 +332,74 @@
     .image-action-btn.primary img {
         width: 120px;
     }
+}
+
+.ad-error-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.ad-error-dialog {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border: 3px solid #ff8c00;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    color: white;
+    min-width: 320px;
+    box-shadow: 0 10px 40px rgba(255, 140, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    animation: dialogPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes dialogPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.ad-error-dialog h3 {
+    margin: 0 0 15px 0;
+    color: #ff8c00;
+    font-size: 26px;
+    font-family: 'Outfit', sans-serif;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.ad-error-dialog p {
+    margin: 0 0 25px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.ad-error-btn {
+    background: linear-gradient(to bottom, #ff9d26, #ff8c00);
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Outfit', sans-serif;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.ad-error-btn:hover {
+    background: linear-gradient(to bottom, #ffae45, #ff9d26);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 140, 0, 0.3);
+}
+
+.ad-error-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }

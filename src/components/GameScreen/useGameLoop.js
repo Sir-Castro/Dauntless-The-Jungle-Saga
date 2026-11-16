@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { PROJECTILE_STATS, PLAYER_STATS, HAZARD_STATS, TURRET_STATS, ENEMY_STATS, GLOBAL_STATS } from '../../constants.js';
+import { PROJECTILE_STATS, PLAYER_STATS, HAZARD_STATS, TURRET_STATS, ENEMY_STATS, GLOBAL_STATS, VOLUME_CONFIG } from '../../constants.js';
+import { playSound, playLoopSound, stopLoopSound, SOUNDS } from '../../utils/sounds.js';
 
 const useGameLoop = (params) => {
     const {
@@ -86,10 +87,18 @@ const useGameLoop = (params) => {
         setLevelTime,
         levelTimeRef,
         setIsTimerActive,
-        isTimerActive
+        isTimerActive,
+        onItemEmpty
     } = params;
     const timerAccumulatorRef = useRef(0);
     const shieldedZombiesRef = useRef(new Set());
+
+    const playSoundIfVisible = (name, x, vol = 0.5) => {
+        if (!posRef || !posRef.current) return;
+        const dist = Math.abs(x - posRef.current.x); 
+        // Only play if within the soldier's immediate vicinity (e.g. 100px)
+        if (dist <= 100) playSound(name, vol);
+    };
 
     useEffect(() => {
         shieldedZombiesRef.current.clear();
@@ -115,7 +124,9 @@ const useGameLoop = (params) => {
             const needsTimer = levelId === 2 ||
                 (levelId === 4 && objectivesRef.current?.find(o => o.id === 1)?.status !== 'complete') ||
                 (levelId === 7 && objectivesRef.current?.find(o => o.id === 2)?.status !== 'complete') ||
-                (levelId === 9 && objectivesRef.current?.find(o => o.id === 2)?.status !== 'complete');
+                (levelId === 9 && objectivesRef.current?.find(o => o.id === 1)?.status !== 'complete') ||
+                (levelId === 16 && objectivesRef.current?.find(o => o.id === 1)?.status !== 'complete') ||
+                (levelId === 17 && objectivesRef.current?.find(o => o.id === 1)?.status !== 'complete');
 
             if (needsTimer && !isGameOver && !isLevelComplete && !isPauseOpen && respawnTimer === 0) {
                 timerAccumulatorRef.current += elapsed;
@@ -131,6 +142,7 @@ const useGameLoop = (params) => {
             }
 
             if (isGameOver || isLevelComplete || respawnTimer > 0 || isDebriefOpen || isPauseOpen) {
+                stopLoopSound(SOUNDS.ZOMBIE_VOICE);
                 animationFrameId = requestAnimationFrame(loop);
                 return;
             }
@@ -200,12 +212,39 @@ const useGameLoop = (params) => {
             );
             setIsZombieNearby(isZombieNearby);
 
+            const isAnyZombieActive = enemies.some(e => 
+                e && e.hp > 0 && e.type.startsWith('z') && 
+                (e.state === 'walk' || e.state === 'run' || e.state === 'attack') && 
+                Math.abs(e.x - nextX) <= 100
+            );
+
+            if (isAnyZombieActive && !isGameOver && !isLevelComplete && !isPauseOpen && respawnTimer === 0) {
+                playLoopSound(SOUNDS.ZOMBIE_VOICE, VOLUME_CONFIG.ZOMBIE_VOICE || 0.6);
+            } else {
+                stopLoopSound(SOUNDS.ZOMBIE_VOICE);
+            }
+
+
             const isEnemyInSight = enemies.some(e => {
                 if (e.hp <= 0) return false;
                 const relX = e.x - (cameraXRef.current || 0);
                 return relX > -10 && relX < 110;
             });
             setIsEnemyInSight(isEnemyInSight);
+            // Detect empty item usages for the Shop feature
+            if (keys['KeyH'] && shieldsRef.current <= 0 && onItemEmpty && levelId !== 1) {
+                keys['KeyH'] = false;
+                onItemEmpty('shield');
+            }
+            if (keys['KeyV'] && medkitsRef.current <= 0 && onItemEmpty && ![2, 8].includes(levelId)) {
+                keys['KeyV'] = false;
+                onItemEmpty('medkit');
+            }
+            if (keys['KeyG'] && grenadesRef.current <= 0 && onItemEmpty && ![1, 15].includes(levelId)) {
+                keys['KeyG'] = false;
+                onItemEmpty('grenade');
+            }
+
             const shieldTrigger = keys['KeyH'] && shieldsRef.current > 0 && !isShieldActiveRef.current && !isShieldOnCooldownRef.current &&
                 !['dead', 'recharge'].includes(intendedState) && levelId !== 1;
             if (shieldTrigger) {
@@ -217,6 +256,7 @@ const useGameLoop = (params) => {
                 setIsShieldOnCooldown(true);
                 shieldTimeRef.current = 60; // 1 seconds at 60fps
                 keys['KeyH'] = false; // Debounce tactial input to prevent auto-reactivation
+                playSound(SOUNDS.SHIELD, VOLUME_CONFIG.SHIELD);
             }
 
             // Manual Medical Regeneration: Restores 50% HP using tactical reserve medkits (Limit: 5)
@@ -226,6 +266,7 @@ const useGameLoop = (params) => {
                 medkitsRef.current--;
                 setMedkits(medkitsRef.current);
                 keys['KeyV'] = false; // Debounce manual injection
+                playSound(SOUNDS.MEDKIT_PICKUP, VOLUME_CONFIG.MEDKIT_PICKUP);
 
                 // Mission Failure Tracker: Medkit usage restricts tactical achievements in Levels 2 & 8
                 if ([2, 8].includes(levelId)) {
@@ -325,10 +366,11 @@ const useGameLoop = (params) => {
                         fireRateModRef.current = Math.min(2.5, fireRateModRef.current + 0.2);
 
                         const shotFacing = playerFacingRef.current;
+                        playSound(SOUNDS.SHOOT, VOLUME_CONFIG.PLAYER_SHOOT);
                         projectilesRef.current.push({
                             id: now + Math.random(),
                             x: nextX + (shotFacing * 2),
-                            y: nextY + 18.0,
+                            y: nextY + PROJECTILE_STATS.PLAYER_BULLET_SPAWN_HEIGHT,
                             vx: shotFacing * PROJECTILE_STATS.PLAYER_BULLET_SPEED,
                             facing: shotFacing,
                             owner: 'player',
@@ -351,6 +393,10 @@ const useGameLoop = (params) => {
             }
 
             if (intendedState !== playerStateRef.current) {
+                if (intendedState === 'recharge') playSound(SOUNDS.RELOAD, VOLUME_CONFIG.RELOAD);
+                if (intendedState === 'shield') playSound(SOUNDS.SHIELD, VOLUME_CONFIG.SHIELD);
+                if (intendedState === 'grenade') playSound(SOUNDS.GRENADE, VOLUME_CONFIG.PLAYER_GRENADE);
+                
                 playerStateRef.current = intendedState;
                 setPlayerState(intendedState);
                 setPlayerFrame(0);
@@ -481,11 +527,13 @@ const useGameLoop = (params) => {
             }
 
             // Death Plane Trigger (Fall into pits)
-            if (nextY < -15 && playerStateRef.current !== 'dead') {
+            if (nextY < 0 && playerStateRef.current !== 'dead') {
                 playerStateRef.current = 'dead';
                 setPlayerState('dead');
                 setPlayerFrame(0);
                 nextVelY = -0.05;
+                hpRef.current = 0;
+                setHp(0);
             }
 
             velRef.current.y = nextVelY;
@@ -598,6 +646,7 @@ const useGameLoop = (params) => {
                         if (playerStateRef.current === 'grenade') {
                             nextLife = 1;
                         } else {
+                            playSound(SOUNDS.EXPLOSION, VOLUME_CONFIG.EXPLOSION);
                             newSmokes.push({
                                 id: Math.random(),
                                 type: 'grenade_explosion',
@@ -674,6 +723,87 @@ const useGameLoop = (params) => {
                     });
 
                     if (hitEnemyIds.length > 0) {
+                        const zombiesKilled = enemies.filter(e => hitEnemyIds.includes(e.id) && e.hp > 0 && e.hp <= PROJECTILE_STATS.GRENADE_DAMAGE_THRESHOLD && e.type.startsWith('z')).length;
+                        const raidersKilled = enemies.filter(e => hitEnemyIds.includes(e.id) && e.hp > 0 && e.hp <= PROJECTILE_STATS.GRENADE_DAMAGE_THRESHOLD && e.type.startsWith('raider')).length;
+
+                        if (levelId === 11 && zombiesKilled >= 2) {
+                            setObjectives(obs => {
+                                return obs.map(o => {
+                                    if (o.id === 1 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 2);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                            });
+                        }
+
+                        if (levelId === 12 && zombiesKilled >= 1 && raidersKilled >= 1) {
+                            setObjectives(obs => {
+                                return obs.map(o => {
+                                    if (o.id === 1 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 1);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                            });
+                        }
+
+                        if (levelId === 13 && zombiesKilled >= 2 && raidersKilled >= 2) {
+                            setObjectives(obs => {
+                                return obs.map(o => {
+                                    if (o.id === 1 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 1);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                            });
+                        }
+
+                        if (levelId === 14 && raidersKilled >= 3) {
+                            setObjectives(obs => {
+                                return obs.map(o => {
+                                    if (o.id === 2 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 1);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                            });
+                        }
+
+                        if (levelId === 18 && zombiesKilled >= 2) {
+                            setObjectives(obs => {
+                                return obs.map(o => {
+                                    if (o.id === 1 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 2);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                            });
+                        }
+
+                        if (levelId === 18 && raidersKilled >= 2) {
+                            setObjectives(obs => {
+                                return obs.map(o => {
+                                    if (o.id === 2 && o.status === 'active') {
+                                        const nextCount = (o.current || 0) + 1;
+                                        const isDone = nextCount >= (o.target || 1);
+                                        return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                    }
+                                    return o;
+                                });
+                            });
+                        }
+
                         setEnemies(prev => prev.map(item => {
                             if (hitEnemyIds.includes(item.id) && item.hp > 0) {
                                 const newHp = Math.max(0, item.hp - PROJECTILE_STATS.GRENADE_DAMAGE_THRESHOLD);
@@ -681,17 +811,19 @@ const useGameLoop = (params) => {
                                 const isRaider = item.type.startsWith('raider');
 
                                 if (newHp === 0) {
+                                    if (isRaider) playSoundIfVisible(SOUNDS.RAIDER_DEATH, item.x, VOLUME_CONFIG.RAIDER_DEATH);
                                     const points = isZombie
                                         ? (ENEMY_STATS.ZOMBIE_POINTS[item.type] || 0)
                                         : (ENEMY_STATS.RAIDER_POINTS[item.type] || 0);
                                     scoreRef.current += points;
                                     setScore(scoreRef.current);
-                                    if ([2, 3, 4, 5, 7, 8, 9, 10].includes(levelId)) {
+                                    if ([1, 2, 3, 4, 5, 7, 8, 9, 10, 14, 15, 16, 17, 19, 20].includes(levelId)) {
                                         setObjectives(obs => {
                                             return obs.map(o => {
                                                 if (o.status !== 'active') return o;
                                                 let increment = false;
 
+                                                if (levelId === 1 && o.id === 2 && isRaider) increment = true;
                                                 if (levelId === 2 && o.id === 1 && isZombie) increment = true;
                                                 if (levelId === 3 && o.id === 1 && isZombie) increment = true;
                                                 if (levelId === 4) {
@@ -701,8 +833,14 @@ const useGameLoop = (params) => {
                                                 if (levelId === 5 && o.id === 1 && isRaider) increment = true;
                                                 if (levelId === 7 && o.id === 1) increment = true; // Grenade kills specific objective
                                                 if (levelId === 8 && o.id === 1 && isZombie) increment = true;
-                                                if (levelId === 9 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 9 && o.id === 2 && isRaider) increment = true;
                                                 if (levelId === 10 && o.id === 2 && isZombie) increment = true;
+                                                if (levelId === 14 && o.id === 1 && isZombie && isShieldActiveRef.current) increment = true;
+                                                if (levelId === 15 && o.id === 2 && isRaider) increment = true;
+                                                if (levelId === 16 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 17 && o.id === 1 && isZombie) increment = true;
+                                                if (levelId === 19 && o.id === 2 && isRaider) increment = true;
+                                                if (levelId === 20 && o.id === 1) increment = true;
 
                                                 if (increment) {
                                                     const nextCount = (o.current || 0) + 1;
@@ -766,9 +904,23 @@ const useGameLoop = (params) => {
                     const isVisible = relX > -10 && relX < 110;
                     if (!isVisible) return;
 
-                    const distX = Math.abs(p.x - e.x);
-                    const distY = Math.abs(p.y - (e.y + 18));
-                    if (distX < 6 && distY < 12) {
+                    const prevX = p.x - p.vx;
+                    const prevY = p.y - (p.vy || 0);
+                    const currX = p.x;
+                    const currY = p.y;
+                    const enemyX = e.x;
+                    const enemyY = e.y + 18;
+
+                    const crossedCenterX = (prevX >= enemyX && currX <= enemyX) || (prevX <= enemyX && currX >= enemyX);
+                    const crossedCenterY = (prevY >= enemyY && currY <= enemyY) || (prevY <= enemyY && currY >= enemyY);
+
+                    const distX = Math.abs(currX - enemyX);
+                    const distY = Math.abs(currY - enemyY);
+                    
+                    const hitX = (crossedCenterX || distX < 6) && distY < 12;
+                    const hitY = (crossedCenterY || distY < 12) && distX < 6;
+
+                    if (hitX || hitY) {
                         hitEnemyId = e.id;
                     }
                 });
@@ -795,6 +947,7 @@ const useGameLoop = (params) => {
                                 const newHp = Math.max(0, e.hp - damage);
 
                                 if (newHp === 0) {
+                                    if (isRaider) playSoundIfVisible(SOUNDS.RAIDER_DEATH, e.x, VOLUME_CONFIG.RAIDER_DEATH);
                                     const points = isZombie
                                         ? (ENEMY_STATS.ZOMBIE_POINTS[e.type] || 0)
                                         : (ENEMY_STATS.RAIDER_POINTS[e.type] || 0);
@@ -821,12 +974,12 @@ const useGameLoop = (params) => {
                                         });
                                     }
 
-                                    if (levelId === 4 && isZombie) {
+                                    if (levelId === 4 && isZombie && p.owner === 'player') {
                                         setObjectives(obs => {
                                             return obs.map(o => {
                                                 if (o.id === 1 && o.status === 'active') {
                                                     const nextCount = (o.current || 0) + 1;
-                                                    const isDone = nextCount >= (o.target || 10);
+                                                    const isDone = nextCount >= (o.target || 5);
                                                     return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
                                                 }
                                                 return o;
@@ -834,8 +987,8 @@ const useGameLoop = (params) => {
                                         });
                                     }
 
-                                    // Tactical Combat Objectives (Levels 5, 7, 8, 9, 10)
-                                    if ([5, 7, 8, 9, 10].includes(levelId)) {
+                                    // Tactical Combat Objectives (Levels 1, 5, 7, 8, 9, 10, 11, 12, 15, 16, 17, 19, 20)
+                                    if ([1, 5, 7, 8, 9, 10, 11, 12, 15, 16, 17, 19, 20].includes(levelId)) {
                                         const isRaider = e.type.startsWith('raider');
                                         const isZomb = e.type.startsWith('z');
                                         const fromPlayer = p.owner === 'player' && p.type !== 'punch';
@@ -847,15 +1000,30 @@ const useGameLoop = (params) => {
                                                 if (o.status !== 'active') return o;
                                                 let increment = false;
 
-                                                if (levelId === 5 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 1 && o.id === 2 && isRaider && fromPlayer) increment = true;
+                                                if (levelId === 5 && o.id === 1 && isRaider && fromPlayer) increment = true;
                                                 if (levelId === 7 && o.id === 1 && fromGrenade) increment = true;
 
-                                                if (levelId === 9 && o.id === 1 && isRaider) increment = true;
+                                                if (levelId === 9 && o.id === 2 && isRaider && fromPlayer) increment = true;
 
                                                 if (levelId === 10) {
                                                     if (o.id === 1 && isRaider && fromZombMelee) increment = true;
                                                     if (o.id === 2 && isZomb && fromGrenade) increment = true;
                                                 }
+                                                
+                                                if (levelId === 11 && o.id === 2 && isRaider && fromPlayer) increment = true;
+
+                                                if (levelId === 12 && o.id === 2 && isZomb && fromPlayer) increment = true;
+
+                                                if (levelId === 15 && o.id === 2 && isRaider && fromGrenade) increment = true;
+
+                                                if (levelId === 16 && o.id === 1 && isRaider && fromPlayer) increment = true;
+
+                                                if (levelId === 17 && o.id === 1 && isZomb && fromPlayer) increment = true;
+
+                                                if (levelId === 19 && o.id === 2 && isRaider && fromPlayer) increment = true;
+
+                                                if (levelId === 20 && o.id === 1 && fromPlayer) increment = true;
 
                                                 if (increment) {
                                                     const nextCount = (o.current || 0) + 1;
@@ -880,6 +1048,11 @@ const useGameLoop = (params) => {
                         }
                         return e;
                     }));
+                    
+                    const hitEnemy = enemies.find(e => e.id === hitEnemyId);
+                    if (hitEnemy) {
+                        return false;
+                    }
                     return false;
                 }
 
@@ -903,14 +1076,47 @@ const useGameLoop = (params) => {
                         if (h.hp === undefined) h.hp = 10;
                         h.hp = Math.max(0, h.hp - 1);
                         h.hurtFlash = 10;
+
+                        if (h.hp === 0) {
+                            if ([13, 15, 17].includes(levelId)) {
+                                setObjectives(obs => {
+                                    return obs.map(o => {
+                                        const isTurretObj = (levelId === 13 && o.id === 2) ||
+                                            (levelId === 15 && o.id === 1) ||
+                                            (levelId === 17 && o.id === 2);
+
+                                        if (isTurretObj && o.status === 'active') {
+                                            const nextCount = (o.current || 0) + 1;
+                                            const isDone = nextCount >= (o.target || 1);
+                                            return { ...o, current: nextCount, status: isDone ? 'complete' : 'active' };
+                                        }
+                                        return o;
+                                    });
+                                });
+                            }
+                        }
                     }
                     return false; // Bullet destroyed on impact
                 }
 
                 if (p.owner === 'enemy') {
-                    const pDist = Math.abs(p.x - posRef.current.x);
-                    const pVDist = Math.abs(p.y - (posRef.current.y + 11)); // Target chest/waist
-                    if (pDist < 3.8 && pVDist < 7.5) { // Narrowed hitbox for precision targeting
+                    const prevX = p.x - p.vx;
+                    const currX = p.x;
+                    const playerX = posRef.current.x;
+                    const prevY = p.y - (p.vy || 0);
+                    const currY = p.y;
+                    const playerY = posRef.current.y + 11; // Target chest/waist
+                    
+                    // CCD: Prevent high-speed tunneling through the narrow core hitbox
+                    const crossedCenterX = (prevX >= playerX && currX <= playerX) || (prevX <= playerX && currX >= playerX);
+                    const crossedCenterY = (prevY >= playerY && currY <= playerY) || (prevY <= playerY && currY >= playerY);
+                    const pDist = Math.abs(currX - playerX);
+                    const pVDist = Math.abs(currY - playerY);
+                    
+                    const hitX = (crossedCenterX || pDist < 3.8) && pVDist < 12.0;
+                    const hitY = (crossedCenterY || pVDist < 12.0) && pDist < 3.8;
+
+                    if (hitX || hitY) { // Impact at core mass
                         if (isShieldActiveRef.current) {
                             // Level 8: Shield Defense Objective - Unique Zombies Only
                             if (levelId === 8 && p.type === 'punch' && p.parentId && !shieldedZombiesRef.current.has(p.parentId)) {
@@ -944,14 +1150,18 @@ const useGameLoop = (params) => {
                         }
 
                         // Allow turret bullets to inflict individual damage even during hurt flash invincibility
-                        if (hurtTimerRef.current > 0 && p.type !== 'turret_bullet') return false;
+                        if (hurtTimerRef.current > 0 && p.type !== 'turret_bullet') {
+                            return false;
+                        }
 
-                        if (hpRef.current > 0) {
+                        if (hpRef.current > 0 && p.damage !== 0) {
                             hpRef.current = Math.max(0, hpRef.current - (p.damage || difficulty.enemyDmg));
                             setHp(hpRef.current);
+                            if (hpRef.current === 0) playSound(SOUNDS.SOLDIER_DEATH, VOLUME_CONFIG.PLAYER_DEATH);
                             hurtTimerRef.current = 24; // ~400ms flash pulse
                             setIsHurtFlash(true);
                         }
+                        
                         return false;
                     }
                 }
@@ -1008,17 +1218,17 @@ const useGameLoop = (params) => {
                 }
                 if (i.type === 'coin' && !collectedCoinsRef.current.includes(i.id)) {
                     if (dx < 10 && dy >= -8 && dy < 25) {
+                        playSound(SOUNDS.COIN_PICKUP, VOLUME_CONFIG.COIN_PICKUP);
                         setCollectedCoins(prev => prev.includes(i.id) ? prev : [...prev, i.id]);
                         collectedCoinsRef.current.push(i.id);
                         scoreRef.current += 10;
                         setScore(scoreRef.current);
 
-                        if ([1, 4, 5, 6, 9].includes(levelId)) {
+                        if ([1, 5, 6, 9, 16].includes(levelId)) {
                             setObjectives(obs => {
                                 const newObs = obs.map(o => {
-                                    const isCoinObjective = (levelId === 1 && o.id === 1) ||
-                                        (levelId === 4 && o.id === 2) ||
-                                        ([5, 6, 9].includes(levelId) && o.id === 2);
+                                    const isCoinObjective = ([1, 9].includes(levelId) && o.id === 1) ||
+                                        ([5, 6, 16].includes(levelId) && o.id === 2);
 
                                     if (isCoinObjective && o.status === 'active') {
                                         const nextCount = (o.current || 0) + 1;
@@ -1040,6 +1250,7 @@ const useGameLoop = (params) => {
                 if (i.type === 'kit' && !collectedKitsRef.current.includes(i.id)) {
                     if (dx < 10 && dy >= -8 && dy < 25) {
                         if (medkitsRef.current < (PLAYER_STATS.MAX_MEDKITS || 2)) {
+                            playSound(SOUNDS.MEDKIT_PICKUP, VOLUME_CONFIG.MEDKIT_PICKUP);
                             setCollectedKits(prev => prev.includes(i.id) ? prev : [...prev, i.id]);
                             collectedKitsRef.current.push(i.id);
                             medkitsRef.current++;
@@ -1084,6 +1295,7 @@ const useGameLoop = (params) => {
                                 const muzzleDistance = TURRET_STATS.T1_MUZZLE_OFFSET;
                                 const spawnX = turretCenterX + Math.cos(angleRad) * muzzleDistance;
                                 const spawnY = turretCenterY + Math.sin(angleRad) * muzzleDistance;
+                                playSoundIfVisible(SOUNDS.TURRET_SHOT, turretCenterX, VOLUME_CONFIG.TURRET_SHOT);
 
                                 projectilesRef.current.push({
                                     id: performance.now() + Math.random(),
@@ -1158,6 +1370,7 @@ const useGameLoop = (params) => {
                             const damage = h.type === 'spikes' ? PLAYER_STATS.SPIKE_DAMAGE_THRESHOLD : 25;
                             hpRef.current = Math.max(0, hpRef.current - damage);
                             setHp(hpRef.current);
+                            if (hpRef.current === 0) playSound(SOUNDS.SOLDIER_DEATH, VOLUME_CONFIG.PLAYER_DEATH);
                             hurtTimerRef.current = 24;
                             setIsHurtFlash(true);
                         }
@@ -1168,8 +1381,9 @@ const useGameLoop = (params) => {
             (enemiesRef.current || []).forEach(e => {
                 if (e.hasDroppedAmmo) {
                     const dx = Math.abs(nextX - e.x);
-                    const dy = nextY - e.y;
-                    if (dx < 4 && dy >= -5 && dy < 15) {
+                    const dy = nextY - (e.y + 12);
+                    if (dx < 20 && dy >= -20 && dy < 30) {
+                        playSound(SOUNDS.AMMO_PICKUP, VOLUME_CONFIG.PICKUP);
                         e.hasDroppedAmmo = false;
                         setEnemies(prev => prev.map(enemy =>
                             enemy.id === e.id ? { ...enemy, hasDroppedAmmo: false } : enemy
@@ -1193,6 +1407,9 @@ const useGameLoop = (params) => {
                         setHp,
                         velRef,
                         playerState: playerStateRef.current,
+                        playSoundIfVisible,
+                        SOUNDS,
+                        VOLUME_CONFIG,
                         playerStateRef,
                         isShieldActiveRef,
                         setPlayerState,
@@ -1336,7 +1553,7 @@ const useGameLoop = (params) => {
                             return 0;
                         }
                         if (curState === 'dead') {
-                            if (levelId === 3) {
+                            if (levelId === 3 || levelId === 19) {
                                 // Handled by GameScreen effect for immediate total reset
                                 return f;
                             }

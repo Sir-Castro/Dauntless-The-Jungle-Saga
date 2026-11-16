@@ -2,8 +2,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -281,17 +281,15 @@
 
 .minimal-level-node.unlocked:hover {
     transform: translateY(-5px);
-    filter: brightness(1.2) drop-shadow(0 0 15px rgba(0, 255, 163, 0.3));
+    filter: brightness(1.2);
 }
 
 .minimal-level-node.unlocked:hover .node-num-focus {
-    color: var(--accent-primary);
     transform: scale(1.1);
-    text-shadow: 0 0 20px rgba(0, 255, 163, 0.4);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 .minimal-level-node.unlocked:hover .node-status-marker {
-    color: var(--accent-primary);
     opacity: 0.8;
 }
 
@@ -312,11 +310,19 @@
     opacity: 1;
 }
 
-/* Selecting State Effect - Synchronized with Main Menu standards */
+@keyframes nodePulse {
+    0% { transform: translateY(-5px) scale(1); filter: brightness(1.2); }
+    50% { transform: translateY(-5px) scale(1.05); filter: brightness(1.5); }
+    100% { transform: translateY(-5px) scale(1); filter: brightness(1.2); }
+}
+
 .minimal-level-node.selecting {
-    transform: translateY(4px);
-    filter: brightness(0.9);
     pointer-events: none;
+    animation: nodePulse 1.5s ease-in-out infinite;
+}
+
+.minimal-level-node.selecting .node-num-focus {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
 }
 
 .level-select-overlay.is-navigating {

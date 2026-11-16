@@ -42,12 +42,12 @@ const HudTop = ({ hp, rad, magSize, currentMag, ammo, grenades, shields, isShiel
                         </div>
 
                         <div className="side-kit-row">
-                            <div className={`grenade-inventory ${(grenades <= 0 || levelId === 1) ? 'inactive' : ''}`} style={{ filter: levelId === 1 ? 'grayscale(1) brightness(0.6)' : 'none' }}>
+                            <div className={`grenade-inventory ${(grenades <= 0) ? 'inactive' : ''}`}>
                                 <img src="/buttons/Grenade.png" alt="G" className="hud-grenade-icon" />
                                 <span className="inventory-count">x{grenades}</span>
                             </div>
 
-                            <div className={`shield-inventory ${isShieldActive ? 'active' : ''} ${(isShieldOnCooldown || shields <= 0 || levelId === 1) ? 'inactive' : ''}`} style={{ filter: levelId === 1 ? 'grayscale(1) brightness(0.6)' : 'none' }}>
+                            <div className={`shield-inventory ${isShieldActive ? 'active' : ''} ${(isShieldOnCooldown || shields <= 0) ? 'inactive' : ''}`}>
                                 <img src="/buttons/Shield.png" alt="S" className="hud-shield-icon" />
                                 <span className="inventory-count">x{shields}</span>
                             </div>
@@ -58,7 +58,7 @@ const HudTop = ({ hp, rad, magSize, currentMag, ammo, grenades, shields, isShiel
 
             {/* CENTER: MISSION CONTROL */}
             <div className="hud-center-mission">
-                <div className="sector-title">{levelTitle}</div>
+                <div className="sector-title">Level {levelId}</div>
 
                 {objectives && objectives.length > 0 && (() => {
                     const displayObjs = objectives;
@@ -78,7 +78,13 @@ const HudTop = ({ hp, rad, magSize, currentMag, ammo, grenades, shields, isShiel
                     );
                 })()}
 
-                {(levelId === 2 || ([4, 7, 9].includes(levelId) && objectives.some(o => o.status === 'active'))) && (
+                {(levelId === 2 || 
+                  (levelId === 4 && objectives.find(o => o.id === 1)?.status !== 'complete') ||
+                  (levelId === 7 && objectives.find(o => o.id === 2)?.status !== 'complete') ||
+                  (levelId === 9 && objectives.find(o => o.id === 1)?.status !== 'complete') ||
+                  (levelId === 16 && objectives.find(o => o.id === 1)?.status !== 'complete') ||
+                  (levelId === 17 && objectives.find(o => o.id === 1)?.status !== 'complete')
+                ) && (
                     <div className={`chrono ${levelTime < 30 ? 'warning' : ''}`}>
                         <div className="time-value">{formatTime(levelTime)}</div>
                     </div>
@@ -91,7 +97,7 @@ const HudTop = ({ hp, rad, magSize, currentMag, ammo, grenades, shields, isShiel
                     <div className="module-header">MISSION SCORE</div>
                     <div className="coin-display" style={{ justifyContent: 'flex-end' }}>
                         <span className="coin-icon"></span>
-                        <span className="coin-value">{(score || 0) + (collectedCoins.length * 250)}</span>
+                        <span className="coin-value">{(score || 0) + (collectedCoins.length * 10)}</span>
                     </div>
                 </div>
 

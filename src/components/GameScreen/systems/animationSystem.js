@@ -3,7 +3,8 @@
  */
 export const updateAnimations = (params) => {
     const {
-        frameCount,
+        dt,
+        animTimersRef,
         setKeyFrame,
         setCoinFrame,
         playerStateRef,
@@ -27,15 +28,24 @@ export const updateAnimations = (params) => {
         setIsGameOver
     } = params;
 
-    if (frameCount % 4 === 0) {
+    animTimersRef.current.key += 1 * dt;
+    if (animTimersRef.current.key >= 4) {
+        animTimersRef.current.key -= 4;
         setKeyFrame(f => (f >= 3 ? 0 : f + 1));
+    }
+
+    animTimersRef.current.coin += 1 * dt;
+    if (animTimersRef.current.coin >= 4) {
+        animTimersRef.current.coin -= 4;
         setCoinFrame(f => (f >= 3 ? 0 : f + 1));
     }
 
     const fastAnimStates = ['dead', 'hurt', 'shoot', 'attack', 'recharge', 'grenade', 'run'];
     const animSpeed = fastAnimStates.includes(playerStateRef.current) ? PLAYER_STATS.PLAYER_ANIM_COMBAT : PLAYER_STATS.PLAYER_ANIM_DEFAULT;
 
-    if (frameCount % animSpeed === 0) {
+    animTimersRef.current.player += 1 * dt;
+    if (animTimersRef.current.player >= animSpeed) {
+        animTimersRef.current.player -= animSpeed;
         setPlayerFrame(f => {
             const maxFrames = { idle: 6, walk: 7, run: 5, jump: 5, attack: 4, recharge: 7, shoot: 3, dead: 4, hurt: 3, grenade: 7 };
             const curState = playerStateRef.current;

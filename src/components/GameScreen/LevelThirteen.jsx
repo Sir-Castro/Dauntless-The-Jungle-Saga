@@ -1,20 +1,20 @@
 import { ENEMY_STATS, PROJECTILE_STATS, HAZARD_STATS } from '../../constants';
 
 export const levelThirteenObjectives = [
-    { id: 1, text: 'SECURE THE ENTRANCE HUB', status: 'active' },
-    { id: 2, text: 'DOWNLOAD CENTRAL INTEL', status: 'pending' }
+    { id: 1, text: 'GRENADE 2 RAIDERS AND 2 ZOMBIES AT ONCE', target: 1, current: 0, status: 'active' },
+    { id: 2, text: 'SHOOT DOWN 1 TURRET GUN', target: 1, current: 0, status: 'active' }
 ];
 
 export const getLevelThirteenEnemies = (difficultyMod) => [
-    { id: 'z1_1', type: 'z3', x: 25, y: 35, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'z1_1', type: 'z2', x: 25, y: 35, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
-    { id: 'e4', type: 'raider1', x: 120, y: 18, hp: ENEMY_STATS.RAIDER1_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'z1_2', type: 'z2', x: 150, y: 35, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'e4', type: 'raider1', x: 100, y: 18, hp: ENEMY_STATS.RAIDER1_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'z1_2', type: 'z2', x: 120, y: 35, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
 
     { id: 'z1_3', type: 'z1', x: 200, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
     { id: 'e5', type: 'raider2', x: 180, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
 
-    { id: 'z1_4', type: 'z12', x: 340, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
+    { id: 'z1_4', type: 'z2', x: 340, y: 10, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
     { id: 'e8', type: 'raider2', x: 310, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'e9', type: 'raider2', x: 330, y: 10, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER2_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
 
@@ -36,9 +36,9 @@ export const getLevelThirteenEnemies = (difficultyMod) => [
 
     { id: 'e19', type: 'raider2', x: 740, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'e20', type: 'raider2', x: 800, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e21', type: 'raider2', x: 860, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e22', type: 'raider2', x: 880, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
-    { id: 'e23', type: 'raider2', x: 910, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e21', type: 'raider2', x: 840, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e22', type: 'raider2', x: 860, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
+    { id: 'e23', type: 'raider2', x: 880, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'e24', type: 'raider2', x: 940, y: 30, hp: ENEMY_STATS.RAIDER2_HP, state: 'idle', frame: 0, facing: -1, patrolRange: ENEMY_STATS.RAIDER1_PATROL_RANGE, detectRange: 60, velY: 0, isGrounded: true, lastJumpTime: 0 },
     { id: 'z1_11', type: 'z2', x: 960, y: 35, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
     { id: 'z1_12', type: 'z1', x: 980, y: 35, state: 'idle', frame: 0, facing: -1, patrolRange: [30, 80], detectRange: ENEMY_STATS.ZOMBIE_DETECT_RANGE, velY: 0, isGrounded: true },
@@ -51,11 +51,11 @@ export const levelThirteenLayout = {
         { id: 'g8', type: 'floor', x: 90, y: 50, w: 400, h: 80, },
         { id: 'g8', type: 'floor', x: 230, y: 50, w: 400, h: 80, },
         { id: 'g8', type: 'floor', x: 240, y: 40, w: 400, h: 80, },
-        { id: 'g8', type: 'floor', x: 400, y: 50, w: 400, h: 80, },
+        { id: 'g8', type: 'floor', x: 400, y: 60, w: 400, h: 80, },
         { id: 'g8', type: 'floor', x: 420, y: 60, w: 400, h: 80, },
         { id: 'g8', type: 'floor', x: 480, y: 50, w: 400, h: 80, },
         { id: 'g8', type: 'floor', x: 510, y: 40, w: 400, h: 80, },
-        { id: 'g8', type: 'floor', x: 540, y: 30, w: 400, h: 80, },
+        { id: 'g8', type: 'floor', x: 540, y: 40, w: 400, h: 80, },
 
         { id: 'g15', type: 'floor', x: 84, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 94, y: -5, w: 400, h: 80, },
@@ -113,12 +113,18 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 204, y: 25, w: 400, h: 80, },
 
         { id: 'g15', type: 'floor', x: 214, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 216, y: 10, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 214, y: 10, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 214, y: 15, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 214, y: 20, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 226, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 226, y: 10, w: 400, h: 80, },
+
+
+
+
+
+
+
+
 
         { id: 'g15', type: 'floor', x: 284, y: 5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 284, y: 10, w: 400, h: 80, },
@@ -187,6 +193,12 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 10, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 20, y: -5, w: 400, h: 80, },
 
+
+
+        { id: 'g15', type: 'floor', x: 56, y: -5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 70, y: -5, w: 400, h: 80, },
+
+
         { id: 'g15', type: 'floor', x: -2, y: 5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 10, y: 5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 20, y: 5, w: 400, h: 80, },
@@ -195,15 +207,9 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 10, y: 10, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 20, y: 10, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 30, y: 30, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 30, y: 20, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 30, y: 10, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 30, y: 0, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 43, y: 30, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 43, y: 20, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 43, y: 10, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 43, y: 0, w: 400, h: 80, },
+
+
 
         { id: 'g15', type: 'floor', x: 56, y: 30, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 56, y: 20, w: 400, h: 80, },
@@ -217,13 +223,21 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 80, y: 10, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 82, y: 0, w: 400, h: 80, },
 
-        { id: 'g1', type: 'floor', x: -2, y: 20, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: -10, y: 20, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 0, y: 20, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 12, y: 20, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 22, y: 20, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 20, y: 20, w: 400, h: 80, },
 
-        { id: 'g1', type: 'floor', x: 30, y: 40, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 40, y: 40, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 50, y: 30, w: 400, h: 80, },
+
+
+
+
+
+
+
+
+
+        { id: 'g1', type: 'floor', x: 56, y: 30, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 60, y: 30, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 70, y: 20, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 80, y: 10, w: 400, h: 80, },
@@ -234,11 +248,10 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 112, y: 5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 119, y: 5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 126, y: 5, w: 400, h: 80, },
-        { id: 'g2', type: 'floor', x: 131, y: 13, w: 400, h: 80, },
+        { id: 'g4', type: 'floor', x: 137, y: 13, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 139, y: 13, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 149, y: 13, w: 400, h: 80, },
         { id: 'g5', type: 'floor', x: 159, y: 13, w: 400, h: 80, },
-        { id: 'g3', type: 'floor', x: 164, y: 4, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 154, y: 30, w: 400, h: 80, },
         { id: 'v1', type: 'floor', x: 153, y: 27, w: 400, h: 80, },
@@ -246,9 +259,9 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 174, y: 30, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 184, y: 30, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 194, y: 30, w: 400, h: 80, },
+
         { id: 'g1', type: 'floor', x: 204, y: 30, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 214, y: 20, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 226, y: 10, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 284, y: 30, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 294, y: 30, w: 400, h: 80, },
@@ -265,11 +278,11 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 196, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 206, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 216, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 226, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 236, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 246, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 256, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 266, y: -5, w: 400, h: 80, },
+
+
+
+
+        { id: 'g15', type: 'floor', x: 265, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 276, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 286, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 296, y: -5, w: 400, h: 80, },
@@ -285,8 +298,8 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 396, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 406, y: -5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 250, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 260, y: 5, w: 400, h: 80, },
+
+        { id: 'g15', type: 'floor', x: 265, y: 5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 270, y: 5, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 171, y: -5, w: 400, h: 80, },
@@ -295,15 +308,21 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 201, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 211, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 221, y: -5, w: 400, h: 80, },
-        { id: 'g4', type: 'floor', x: 239, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 226, y: -5, w: 400, h: 80, },
 
-        { id: 'g1', type: 'floor', x: 240, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 248, y: 5, w: 400, h: 80, },
 
-        { id: 'g4', type: 'floor', x: 262, y: 13, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 265, y: 13, w: 400, h: 80, },
-        { id: 'g5', type: 'floor', x: 278, y: 13, w: 400, h: 80, },
+
+
+
+
+
+
+
+
+
+
+
+        { id: 'g1', type: 'floor', x: 265, y: 5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 275, y: 5, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 283, y: 5, w: 400, h: 80, },
         { id: 'v1', type: 'floor', x: 283, y: 26, w: 400, h: 80, },
@@ -347,8 +366,8 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 448, y: 22, w: 400, h: 80, },
 
         { id: 'g3', type: 'floor', x: 355, y: 4, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 363, y: -5, w: 400, h: 80, },
-        { id: 'g5', type: 'floor', x: 370, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 360, y: -4, w: 400, h: 80, },
+        { id: 'g5', type: 'floor', x: 367, y: -4, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 376, y: 30, w: 400, h: 80, },
         { id: 'g5', type: 'floor', x: 387, y: 30, w: 400, h: 80, },
@@ -375,42 +394,24 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 499, y: -5, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 509, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 519, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 529, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 539, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 549, y: -5, w: 400, h: 80, },
+
         { id: 'g15', type: 'floor', x: 559, y: -5, w: 400, h: 80, },
 
-        { id: 'g2', type: 'floor', x: 510, y: 2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 519, y: 2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 528, y: 2, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 537, y: 2, w: 400, h: 80, },
-        { id: 'g5', type: 'floor', x: 545, y: 2, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 626, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 626, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 626, y: 15, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 634, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 634, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 634, y: 15, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 647, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 647, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 647, y: 15, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 660, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 660, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 660, y: 15, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 673, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 673, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 673, y: 15, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 686, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 686, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 686, y: 15, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 690, y: 21, w: 400, h: 80, },
+
+
+
+
+
+        { id: 'g15', type: 'floor', x: 688, y: -5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 688, y: 5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 688, y: 15, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 688, y: 21, w: 400, h: 80, },
 
         { id: 'g15', type: 'floor', x: 699, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 699, y: 5, w: 400, h: 80, },
@@ -432,33 +433,15 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 738, y: 15, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 738, y: 25, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 751, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 751, y: 5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 748, y: -5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 748, y: 5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 748, y: 15, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 743, y: 23, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 748, y: 23, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 764, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 764, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 777, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 777, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 790, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 790, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 803, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 803, y: 5, w: 400, h: 80, },
-
-        { id: 'g1', type: 'floor', x: 626, y: 15, w: 400, h: 80, },
-        { id: 'v1', type: 'floor', x: 626, y: 15, w: 400, h: 80, },
-        { id: 'v1', type: 'floor', x: 626, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 636, y: 15, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 646, y: 15, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 656, y: 15, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 660, y: 15, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 670, y: 15, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 675, y: 15, w: 400, h: 80, },
 
         { id: 'g1', type: 'floor', x: 550, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 560, y: -5, w: 400, h: 80, },
@@ -471,7 +454,45 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 630, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 640, y: -5, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 650, y: -5, w: 400, h: 80, },
-        { id: 'g5', type: 'floor', x: 662, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 660, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 660, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 670, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 680, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 690, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 700, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 710, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 720, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 730, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 740, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 750, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 760, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 770, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 780, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 790, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 800, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 810, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 820, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 830, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 840, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 850, y: -5, w: 400, h: 80, },
+        { id: 'g1', type: 'floor', x: 860, y: -5, w: 400, h: 80, },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         { id: 'g4', type: 'floor', x: 688, y: 23.2, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 692, y: 23, w: 400, h: 80, },
@@ -481,28 +502,26 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 730, y: 31.2, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 740, y: 31.2, w: 400, h: 80, },
         { id: 'g5', type: 'floor', x: 751, y: 31.2, w: 400, h: 80, },
-        { id: 'g5', type: 'floor', x: 756, y: 23, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 760, y: 15, w: 400, h: 80, },
+        { id: 'g5', type: 'floor', x: 755, y: 23, w: 400, h: 80, },
 
 
 
 
-        { id: 'g15', type: 'floor', x: 756, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 766, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 774, y: 10, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 776, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 786, y: 5, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 796, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 816, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 816, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 829, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 829, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 832, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 832, y: 5, w: 400, h: 80, },
+
+
+
+
+
+
+
+
+
+
+
 
         { id: 'g15', type: 'floor', x: 844, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 844, y: 5, w: 400, h: 80, },
@@ -516,16 +535,10 @@ export const levelThirteenLayout = {
         { id: 'g15', type: 'floor', x: 881, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 881, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 893, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 893, y: 5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 888, y: -5, w: 400, h: 80, },
+        { id: 'g15', type: 'floor', x: 888, y: 5, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 905, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 905, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 905, y: 13, w: 400, h: 80, },
 
-        { id: 'g15', type: 'floor', x: 917, y: -5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 917, y: 5, w: 400, h: 80, },
-        { id: 'g15', type: 'floor', x: 917, y: 13, w: 400, h: 80, },
 
         { id: 'g15', type: 'floor', x: 929, y: -5, w: 400, h: 80, },
         { id: 'g15', type: 'floor', x: 929, y: 5, w: 400, h: 80, },
@@ -599,10 +612,8 @@ export const levelThirteenLayout = {
         { id: 'g1', type: 'floor', x: 888, y: 5, w: 400, h: 80, },
 
 
-        { id: 'g2', type: 'floor', x: 901, y: 13, w: 400, h: 80, },
-        { id: 'g2', type: 'floor', x: 908, y: 21, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 916, y: 21, w: 400, h: 80, },
-        { id: 'g1', type: 'floor', x: 926, y: 21, w: 400, h: 80, },
+
+        { id: 'g1', type: 'floor', x: 929, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 936, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 946, y: 21, w: 400, h: 80, },
         { id: 'g1', type: 'floor', x: 949, y: 21, w: 400, h: 80, },
@@ -624,51 +635,50 @@ export const levelThirteenLayout = {
 
     ],
     hazards: [
-        { id: 't1_1', type: 'turret_top', x: 10, y: 15, w: 100, h: 80 },
         { id: 't1_2', type: 'turret_top', x: 390, y: 15, w: 100, h: 80 },
 
     ],
 
     checkpoints: [
         // Flags
-        { id: 'cp1', x: 24, y: 30, },
-        { id: 'cp2', x: 268, y: 24, },
-        { id: 'cp3', x: 650, y: 25, },
+        { id: 'cp1', x: 24, y: 32, },
+        { id: 'cp2', x: 268, y: 16, },
+        { id: 'cp3', x: 650, y: 8, },
         { id: 'cp4', x: 809, y: 16, },
         { id: 'cp5', x: 1040, y: 24, },
 
     ],
     interactables: [
-        { id: 'exit1', type: 'extraction', x: 1220, y: 0, label: 'EXTRACTION_ZONE' },
+        { id: 'exit1', type: 'extraction', x: 1220, y: 0, },
 
 
         // Air Coins Set 1
         { id: 'c1', type: 'coin', x: 98, y: 65, },
-        { id: 'c2', type: 'coin', x: 150, y: 25, },
-        { id: 'c3', type: 'coin', x: 155, y: 25, },
+        { id: 'c2', type: 'coin', x: 110, y: 20, },
+        { id: 'c3', type: 'coin', x: 125, y: 20, },
         { id: 'c4', type: 'coin', x: 180, y: 44, },
         { id: 'c5', type: 'coin', x: 190, y: 44, },
 
         { id: 'c6', type: 'coin', x: 238, y: 65, },
         { id: 'c7', type: 'coin', x: 248, y: 55, },
 
-        { id: 'c9', type: 'coin', x: 270, y: 25, },
-        { id: 'c10', type: 'coin', x: 275, y: 25, },
+        { id: 'c9', type: 'coin', x: 270, y: 17, },
+        { id: 'c10', type: 'coin', x: 275, y: 17, },
 
-        { id: 'c11', type: 'coin', x: 408, y: 65, },
+        { id: 'c11', type: 'coin', x: 408, y: 75, },
         { id: 'c12', type: 'coin', x: 428, y: 75, },
 
         { id: 'c13', type: 'coin', x: 440, y: 9, },
         { id: 'c14', type: 'coin', x: 450, y: 9, },
         { id: 'c15', type: 'coin', x: 488, y: 65, },
         { id: 'c16', type: 'coin', x: 518, y: 55, },
-        { id: 'c17', type: 'coin', x: 548, y: 45, },
+        { id: 'c17', type: 'coin', x: 548, y: 55, },
 
         { id: 'c18', type: 'coin', x: 600, y: 9, },
         { id: 'c19', type: 'coin', x: 610, y: 9, },
         { id: 'c20', type: 'coin', x: 700, y: 35, },
         { id: 'c21', type: 'coin', x: 710, y: 35, },
-        { id: 'c22', type: 'coin', x: 782, y: 23, },
+        { id: 'c22', type: 'coin', x: 782, y: 8, },
         { id: 'c23', type: 'coin', x: 850, y: 17, },
         { id: 'c24', type: 'coin', x: 855, y: 17, },
 

@@ -1,0 +1,44 @@
+.brand-screen-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.brand-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.brand-logo {
+    max-width: 100px;
+    height: auto;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+}
+
+.brand-logo.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.brand-text {
+    max-width: 200px;
+    height: auto;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+}
+
+.brand-text.visible {
+    opacity: 1;
+    transform: translateY(0);
+}

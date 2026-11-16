@@ -8,12 +8,13 @@ const MAX_VOICES_PER_SOUND = 32;
 
 // Pre-load critical combat sounds to prevent first-play jitter
 const CRITICAL_SOUNDS = [
-    'soldier_rifle_shot',
+    'soldier_rifle_shot2',
     'raider1_shotgun_shot',
     'raider2_machinegun_shot',
     'turret_shot',
     'grenade_explosion',
-    'gun_reload'
+    'gun_reload',
+    'zombie_voice'
 ];
 
 CRITICAL_SOUNDS.forEach(name => {
@@ -21,7 +22,7 @@ CRITICAL_SOUNDS.forEach(name => {
     soundCache[name].load();
     
     // Initialize pool for this sound with tailored sizes to stay within hardware limits
-    const poolSize = (name === 'soldier_rifle_shot' || name === 'raider2_machinegun_shot') ? 8 : 
+    const poolSize = (name === 'soldier_rifle_shot2' || name === 'raider2_machinegun_shot') ? 8 : 
                      (name === 'turret_shot' ? 6 : 4);
 
     soundPools[name] = {
@@ -35,6 +36,7 @@ CRITICAL_SOUNDS.forEach(name => {
 });
 
 const soundInstances = {};
+const loopSoundInstances = {};
 
 export const playSound = (soundName, volume = VOLUME_CONFIG.SFX_DEFAULT) => {
     if (!soundName) return;
@@ -86,9 +88,47 @@ export const stopSound = (soundName) => {
     });
 };
 
+export const playLoopSound = (soundName, volume = VOLUME_CONFIG.SFX_DEFAULT) => {
+    if (!soundName) return;
+    try {
+        if (!loopSoundInstances[soundName]) {
+            const a = new Audio(`/sound/${soundName}.mp3`);
+            a.load();
+            a.loop = true;
+            loopSoundInstances[soundName] = a;
+        }
+        const sound = loopSoundInstances[soundName];
+        if (sound.paused) {
+            sound.volume = volume;
+            sound.play().catch(() => {});
+        } else {
+            sound.volume = volume;
+        }
+    } catch (err) {}
+};
+
+export const stopLoopSound = (soundName) => {
+    if (!soundName || !loopSoundInstances[soundName]) return;
+    try {
+        if (!loopSoundInstances[soundName].paused) {
+            loopSoundInstances[soundName].pause();
+        }
+    } catch (e) {}
+};
+
+export const stopAllLoopSounds = () => {
+    try {
+        Object.values(loopSoundInstances).forEach(sound => {
+            if (!sound.paused) {
+                sound.pause();
+            }
+        });
+    } catch (e) {}
+};
+
 export const startBackgroundMusic = (levelId) => {
     try {
-        const musicName = (levelId % 2 === 0) ? 'background_music2' : 'background_music1';
+        const musicName = 'background_music3';
 
         if (currentMusic) {
             currentMusic.pause();
@@ -112,18 +152,36 @@ export const stopBackgroundMusic = () => {
 };
 
 export const SOUNDS = {
-    SHOOT: 'soldier_rifle_shot',
+    SHOOT: 'soldier_rifle_shot2',
     GRENADE: 'grenade',
     EXPLOSION: 'grenade_explosion',
     SHIELD: 'shield',
     RAIDER_DEATH: 'raider_death_grunt',
     SOLDIER_DEATH: 'soldier_death_grunt',
-    RAIDER1_SHOT: 'raider1_shotgun_shot',
-    RAIDER2_SHOT: 'raider2_machinegun_shot',
-    TURRET_SHOT: 'turret_shot',
+    RAIDER1_SHOT: 'soldier_rifle_shot2',
+    RAIDER2_SHOT: 'soldier_rifle_shot2',
+    TURRET_SHOT: 'soldier_rifle_shot2',
     BUTTON_CLICK: 'button_click',
     RELOAD: 'gun_reload',
     AMMO_PICKUP: 'ammo_pickup',
     COIN_PICKUP: 'coin_pickup',
-    MEDKIT_PICKUP: 'medkit_pickup'
+    MEDKIT_PICKUP: 'medkit_pickup2',
+    ZOMBIE_VOICE: 'zombie_voice'
 };
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if (currentMusic && !currentMusic.paused) {
+                currentMusic.pause();
+                currentMusic._wasPlaying = true;
+            }
+            stopAllLoopSounds();
+        } else {
+            if (currentMusic && currentMusic._wasPlaying) {
+                currentMusic.play().catch(() => {});
+                currentMusic._wasPlaying = false;
+            }
+        }
+    });
+}

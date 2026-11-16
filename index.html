@@ -2,8 +2,12 @@
 <html lang="en">
 
 <head>
+  <script>
+    // Defensive Polyfill for Capacitor Native Bridge Event Sink
+    window.Capacitor = window.Capacitor || {};
+    window.Capacitor.triggerEvent = window.Capacitor.triggerEvent || function () { };
+  </script>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0e0c" />
@@ -16,11 +20,6 @@
 </head>
 
 <body>
-  <script>
-    // Defensive Polyfill for Capacitor Native Bridge Event Sink
-    window.Capacitor = window.Capacitor || {};
-    window.Capacitor.triggerEvent = window.Capacitor.triggerEvent || function () { };
-  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

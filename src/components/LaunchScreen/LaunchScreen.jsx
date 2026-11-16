@@ -8,10 +8,10 @@ const LaunchScreen = ({ onStart }) => {
     // Unified Asset Manifest: Centralizing all required resources for zero-latency screen transitions
     const manifest = useMemo(() => {
         const soldierStates = {
-            idle: 6, walk: 7, run: 5, jump: 5, attack: 4, recharge: 7, shoot1: 3, dead: 4, hurt: 3, grenade: 7
+            idle: 6, walk: 7, run: 5, attack: 4, recharge: 7, shoot1: 3, dead: 4, hurt: 3, grenade: 7
         };
         const raider1States = {
-            idle: 5, walk: 7, run: 7, jump: 10, dead: 3, hurt: 1, attack_1: 8, shoot: 11, recharge: 11
+            idle: 5, walk: 7, run: 7, jump: 10, dead: 3, hurt: 1, attack_: 8, shoot: 11, recharge: 11
         };
         const raider2States = {
             idle: 7, walk: 6, run: 7, jump: 6, dead: 4, hurt: 2, attack: 3, shoot_1_: 3, recharge: 11

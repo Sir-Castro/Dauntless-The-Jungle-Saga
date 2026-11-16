@@ -1,0 +1,100 @@
+LevelEight.jsx:
+
+    { id: 1, text: 'SHIELD ATTACKS FROM 5 ZOMBIES', target: 5, current: 0, status: 'active' },
+    { id: 2, text: 'COMPLETE LEVEL WITHOUT MEDKIT', target: 1, current: 1, status: 'active' }
+
+LevelEighteen.jsx:
+
+    { id: 1, text: 'DESTROY THE INCUBATION CHAMBERS', status: 'active' },
+    { id: 2, text: 'ELIMINATE PROTOTYPE GUARDS', status: 'pending' }
+
+LevelEleven.jsx:
+
+    { id: 1, text: 'INFILTRATE THE OUTPOST RUINS', status: 'active' },
+    { id: 2, text: 'RECOVER SURVIVAL LOGS', status: 'pending' }
+
+LevelFifteen.jsx:
+
+    { id: 1, text: 'BREACH THE QUARANTINE ZONE', status: 'active' },
+    { id: 2, text: 'EXTRACT SPECIMEN DATA', status: 'pending' }
+
+LevelFive.jsx:
+
+    { id: 1, text: 'NEUTRALIZE 12 RAIDER THREATS', target: 12, current: 0, status: 'active' },
+    { id: 2, text: 'SECURE 10 TACTICAL DATA COINS', target: 10, current: 0, status: 'active' }
+
+LevelFour.jsx:
+
+    { id: 1, text: 'NEUTRALIZE 10 ZOMBIES IN 2 MINUTES', target: 10, current: 0, status: 'active' },
+    { id: 2, text: 'KILL 5 RAIDERS WITH GRENADES', target: 5, current: 0, status: 'active' }
+
+LevelFourteen.jsx:
+
+    { id: 1, text: 'INFILTRATE THE NURSERY', status: 'active' },
+    { id: 2, text: 'NEUTRALIZE PROTOTYPE ALPHA', status: 'pending' }
+
+LevelNine.jsx:
+
+    { id: 1, text: 'NEUTRALIZE 12 RAIDER PATROLS', target: 12, current: 0, status: 'active' },
+    { id: 2, text: 'SECURE 10 COINS IN 90 SECONDS', target: 10, current: 0, status: 'active' }
+
+LevelNineteen.jsx:
+
+    { id: 1, text: 'BREACH THE CONTROL TOWER', status: 'active' },
+    { id: 2, text: 'DISABLE THE VIRAL SUPPRESSION FIELD', status: 'pending' }
+
+LevelOne.jsx:
+
+    { id: 1, text: 'SECURE 20 TACTICAL DATA COINS', status: 'active', current: 0, target: 20 },
+    { id: 2, text: 'NEUTRALIZE ALL RAIDER SQUADS', status: 'active' }
+
+LevelSeven.jsx:
+
+    { id: 1, text: 'KILL 8 ENEMIES WITH GRENADES', target: 8, current: 0, status: 'active' },
+    { id: 2, text: 'COMPLETE LEVEL IN UNDER 2 MINUTES', target: 120, current: 0, status: 'active', hideCounter: true }
+
+LevelSeventeen.jsx:
+
+    { id: 1, text: 'INFILTRATE THE EXPERIMENTAL WARD', status: 'active' },
+    { id: 2, text: 'RECOVER MUTATION RESEARCH', status: 'pending' }
+
+LevelSix.jsx:
+
+    { id: 1, text: 'SHOOT DOWN 2 AUTOMATED GUNS', target: 2, current: 0, status: 'active' },
+    { id: 2, text: 'SECURE 15 TACTICAL DATA COINS', target: 15, current: 0, status: 'active' }
+
+LevelSixteen.jsx:
+
+    { id: 1, text: 'CLEAR THE QUARANTINE PERIMETER', status: 'active' },
+    { id: 2, text: 'DESTROY THE VIRAL VATS', status: 'pending' }
+
+LevelTen.jsx:
+
+    { id: 1, text: 'BAIT ZOMBIES TO KILL 10 RAIDERS', target: 10, current: 0, status: 'active' },
+    { id: 2, text: 'NEUTRALIZE 5 ZOMBIES WITH GRENADES', target: 5, current: 0, status: 'active' }
+
+LevelThirteen.jsx:
+
+    { id: 1, text: 'SECURE THE ENTRANCE HUB', status: 'active' },
+    { id: 2, text: 'DOWNLOAD CENTRAL INTEL', status: 'pending' }
+
+LevelThree.jsx:
+
+    { id: 1, text: 'KILL 5 ZOMBIES WITH GRENADES ONLY', target: 5, current: 0, status: 'active' },
+    { id: 2, text: 'COMPLETE THE LEVEL WITHOUT RESPAWNING', status: 'active' }
+
+LevelTwelve.jsx:
+
+    { id: 1, text: 'BREACH THE FORTRESS WALLS', status: 'active' },
+    { id: 2, text: 'DESTROY THE WEAPONS CACHE', status: 'pending' }
+
+LevelTwenty.jsx:
+
+    { id: 1, text: 'SECURE THE SIGNAL TRACKER', status: 'active' },
+    { id: 2, text: 'NEUTRALIZE COMMANDER THREAT', status: 'pending' }
+
+LevelTwo.jsx:
+
+    { id: 1, text: 'NEUTRALIZE 20 FERAL ZOMBIES', status: 'active', current: 0, target: 20 },
+    { id: 2, text: 'REACH EXTRACTION WITHIN 3 MINUTES', status: 'pending' }
+
