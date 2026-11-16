@@ -39,12 +39,12 @@ const BrandScreen = ({ onComplete }) => {
         <div className="brand-screen-container">
             <div className="brand-content">
                 <img
-                    src="/brand/logo.png"
+                    src="/brand/p1.png"
                     alt="Logo"
                     className={`brand-logo ${logoVisible && !fadeOut ? 'visible' : ''}`}
                 />
                 <img
-                    src="/brand/brand.png"
+                    src="/brand/p2.png"
                     alt="Brand"
                     className={`brand-text ${brandVisible && !fadeOut ? 'visible' : ''}`}
                 />

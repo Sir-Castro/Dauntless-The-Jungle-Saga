@@ -22,6 +22,7 @@
     height: auto;
     opacity: 0;
     transform: translateY(10px);
+    filter: hue-rotate(-55deg) drop-shadow(0 0 15px rgba(0, 255, 163, 0.25));
     transition: opacity 1.5s ease-out, transform 1.5s ease-out;
 }
 
@@ -35,6 +36,7 @@
     height: auto;
     opacity: 0;
     transform: translateY(10px);
+    filter: hue-rotate(-55deg) drop-shadow(0 0 15px rgba(0, 255, 163, 0.25));
     transition: opacity 1.5s ease-out, transform 1.5s ease-out;
 }
 

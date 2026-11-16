@@ -1,24 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AdMob, RewardAdPluginEvents } from '@capacitor-community/admob';
 import './MainMenu.css';
 
 const MainMenu = ({ onStartMission, onOpenArsenal, onOpenArchives, playerProgress = 1, onToggleDebug, debugMode, totalCoins = 0, onDoubleCoins }) => {
     const [isPreparingAd, setIsPreparingAd] = useState(false);
     const [adErrorVisible, setAdErrorVisible] = useState(false);
+    const onDoubleCoinsRef = useRef(onDoubleCoins);
 
     useEffect(() => {
-        let isSetup = false;
+        onDoubleCoinsRef.current = onDoubleCoins;
+    }, [onDoubleCoins]);
+
+    useEffect(() => {
+        let listenerHandle = null;
+        let isMounted = true;
+
         const setupAdMob = async () => {
             try {
                 await AdMob.initialize();
-                
-                AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem) => {
+                if (!isMounted) return;
+
+                listenerHandle = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem) => {
                     console.log('User earned reward!', rewardItem);
-                    if (onDoubleCoins) {
-                        onDoubleCoins();
+                    if (onDoubleCoinsRef.current) {
+                        onDoubleCoinsRef.current(rewardItem);
                     }
                 });
-                isSetup = true;
             } catch (err) {
                 console.error("AdMob Setup Error: ", JSON.stringify(err));
             }
@@ -27,11 +34,12 @@ const MainMenu = ({ onStartMission, onOpenArsenal, onOpenArchives, playerProgres
         setupAdMob();
         
         return () => {
-            if (isSetup) {
-                AdMob.removeAllListeners();
+            isMounted = false;
+            if (listenerHandle) {
+                listenerHandle.remove();
             }
         };
-    }, [onDoubleCoins]);
+    }, []);
 
     const handleWatchAd = async () => {
         if (isPreparingAd) return;
